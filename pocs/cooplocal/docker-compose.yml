@@ -127,19 +127,18 @@ services:
     entrypoint: ['sh', '-c']
     command:
       - |
-        PASSWORD=$$(node -e "process.stdout.write(require('crypto').randomBytes(18).toString('base64url'))")
         OUTPUT=$$(node bin/create-org-and-user.js \
           --name "Coop" \
-          --email "admin@coop.local" \
+          --email "$$COOP_ADMIN_EMAIL" \
           --website "https://coop.local" \
           --firstName "Admin" \
           --lastName "User" \
-          --password "$$PASSWORD" 2>&1) \
+          --password "$$COOP_ADMIN_PASSWORD" 2>&1) \
         && echo "$$OUTPUT" \
         && echo "" \
         && echo "============================================" \
-        && echo "  Login:    admin@coop.local" \
-        && echo "  Password: $$PASSWORD" \
+        && echo "  Login:    $$COOP_ADMIN_EMAIL" \
+        && echo "  Password: $$COOP_ADMIN_PASSWORD" \
         && echo "============================================" \
         || { echo "$$OUTPUT"; echo "$$OUTPUT" | grep -q "duplicate key" && echo "Seed user already exists — skipping." || exit 1; }
     env_file: ./coop.env
@@ -160,7 +159,7 @@ services:
     container_name: cg-server
     restart: unless-stopped
     ports:
-      - '${COOP_BIND_ADDR:-127.0.0.1}:8080:8080'
+      - '${COOP_BIND_ADDR:-127.0.0.1}:8081:8080'
     env_file: ./coop.env
     volumes:
       # G1 one-file patch: fix the Zentropi request field name in the stock server's
