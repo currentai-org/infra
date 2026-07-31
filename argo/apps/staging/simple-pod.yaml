@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: currentai-simple-pod-staging
+  name: simple-pod-staging
   namespace: argocd
 spec:
   project: default
