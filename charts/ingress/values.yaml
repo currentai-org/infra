@@ -1,0 +1,122 @@
+# Ingress configuration for web services
+domain: publicai.co
+certificateArn: ""
+
+ingresses:
+  - enabled: true
+    name: web-public-ingress
+    namespace: chat
+    ingressClassName: alb
+    host: chat.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: public-group
+    targetService:
+      name: openwebui-service
+      port: 8080
+
+  - enabled: true
+    name: litellm-public-ingress
+    namespace: platform
+    ingressClassName: alb
+    host: api-internal.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: api-group
+    targetService:
+      name: litellm-service
+      port: 4000
+
+  - enabled: true
+    name: lago-public-ingress
+    namespace: platform
+    ingressClassName: alb
+    host: lago.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: admin-group
+    targetService:
+      name: platform-front-svc
+      port: 80
+
+  - enabled: true
+    name: lago-api-ingress
+    namespace: platform
+    ingressClassName: alb
+    host: lago-api.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/healthcheck-path: /health
+      alb.ingress.kubernetes.io/group.name: api-group
+    targetService:
+      name: platform-api-svc
+      port: 3000
+
+  - enabled: true
+    name: argo-ingress
+    namespace: argocd
+    ingressClassName: alb
+    host: argo.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: admin-group
+    targetService:
+      name: argocd-server
+      port: 80
+
+  # Grafana Dashboard UI
+  - enabled: true
+    name: grafana-ingress
+    namespace: monitoring
+    ingressClassName: alb
+    host: grafana.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: admin-group
+    targetService:
+      name: grafana
+      port: 80
+
+  # Prometheus Server UI
+  - enabled: true
+    name: prometheus-ingress
+    namespace: monitoring
+    ingressClassName: alb
+    host: prometheus.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: admin-group
+    targetService:
+      name: prometheus-server
+      port: 80
+
+# Certificate ARN (passed from command line)
+certificateArn: ""

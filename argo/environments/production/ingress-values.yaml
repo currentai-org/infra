@@ -1,0 +1,16 @@
+domain: aipotluck.org
+
+ingresses:
+  - enabled: true
+    name: simple-pod-ingress
+    namespace: experiment-production
+    ingressClassName: alb
+    host: simple-pod.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+      alb.ingress.kubernetes.io/group.name: public
+    targetService:
+      name: simple-pod-service
+      port: 80

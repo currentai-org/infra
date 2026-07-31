@@ -1,0 +1,40 @@
+{{- range .Values.ingresses }}
+{{- if .enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .name }}
+  {{- if .namespace }}
+  namespace: {{ .namespace }}
+  {{- end }}
+  annotations:
+{{- range $key, $value := .annotations }}
+  {{- if eq $key "alb.ingress.kubernetes.io/certificate-arn" }}
+    {{- $resolvedCert := tpl $value $ }}
+    {{- if $resolvedCert }}
+    {{ $key }}: {{ $resolvedCert | quote }}
+    {{- end }}
+  {{- else }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+spec:
+  ingressClassName: {{ .ingressClassName | default "alb" }}
+  rules:
+  {{- if .host }}
+  - host: {{ tpl .host $ }}
+    http:
+  {{- else }}
+  - http:
+  {{- end }}
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .targetService.name }}
+            port:
+              number: {{ .targetService.port }}
+{{- end }}
+{{- end }}

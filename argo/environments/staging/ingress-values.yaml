@@ -1,0 +1,16 @@
+domain: ai-staging.chat
+# Please add any new service to the alb.ingress.kubernetes.io/group.name: public so that they can all share a load balancee in AWS
+ingresses:
+  - enabled: true
+    name: simple-pod-ingress
+    namespace: experiment-staging
+    ingressClassName: alb
+    host: simple-pod.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+      alb.ingress.kubernetes.io/group.name: public
+    targetService:
+      name: simple-pod-service
+      port: 80
