@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ingress-staging
+  name: infra-ingress-staging
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "3"
