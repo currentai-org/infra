@@ -3,7 +3,7 @@ domain: ai-staging.chat
 ingresses:
   - enabled: true
     name: simple-pod-ingress
-    namespace: experiment-staging
+    namespace: experiment
     ingressClassName: alb
     host: simple-pod.{{ .Values.domain }}
     annotations:

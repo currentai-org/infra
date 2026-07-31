@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: currentai-ingress-production
+  name: currentai-ingress
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "3"
@@ -17,7 +17,7 @@ spec:
         - ../../argo/environments/production/ingress-values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: experiment-production
+    namespace: experiment
   syncPolicy:
     automated:
       prune: true
