@@ -30,6 +30,6 @@ ingresses:
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: currentai-public
     targetService:
-      name: open-webui-open-webui
+      name: open-webui
       port: 80
 
