@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: infra-ingress-production
+  name: currentai-ingress-production
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "3"
