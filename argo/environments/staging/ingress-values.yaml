@@ -16,3 +16,20 @@ ingresses:
     targetService:
       name: simple-pod-service
       port: 80
+
+  - enabled: true
+    name: open-webui-ingress
+    namespace: experiment
+    ingressClassName: alb
+    host: potluckchat.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+    targetService:
+      name: open-webui-open-webui
+      port: 80
+

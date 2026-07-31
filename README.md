@@ -1,4 +1,4 @@
-# Infrastructure Repository
+# Current AI Infrastructure Repository
 
 This repository contains the Helm charts and Argo CD application definitions for our services.
 
