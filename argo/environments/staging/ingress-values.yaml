@@ -10,7 +10,7 @@ ingresses:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-      alb.ingress.kubernetes.io/group.name: public
+      alb.ingress.kubernetes.io/group.name: currentai-public
     targetService:
       name: simple-pod-service
       port: 80
