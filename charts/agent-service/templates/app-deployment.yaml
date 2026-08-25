@@ -35,7 +35,12 @@ spec:
         - name: app
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          # default CMD = uvicorn app:app --port {{ .Values.app.port }}
+          # Image's own CMD hardcodes --port 8731 with no PORT env var read (deploy/Dockerfile:99) — an
+          # app.port override with no matching command here would move every K8s-side reference
+          # (containerPort, both probes, the Service, the NetworkPolicy) while the process itself kept
+          # listening on 8731. Pass it explicitly, matching proxy-deployment.yaml's own pattern, so the
+          # value is actually wired end to end rather than just plausible-looking.
+          command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", {{ .Values.app.port | quote }}]
           ports:
             - containerPort: {{ .Values.app.port }}
           envFrom:
