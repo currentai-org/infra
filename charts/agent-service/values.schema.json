@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["image", "app", "proxy"],
+  "properties": {
+    "image": {
+      "type": "object",
+      "required": ["repository", "tag"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "minLength": 1 },
+        "pullPolicy": { "type": "string", "enum": ["IfNotPresent", "Always", "Never"] }
+      }
+    },
+    "app": {
+      "type": "object",
+      "required": ["secretName"],
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "description": "Must stay 1 — the SQLite task store and in-memory concurrency cap are per-pod state."
+        },
+        "port": { "type": "integer" },
+        "pvcSize": { "type": "string" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "resources": { "type": "object" },
+        "env": { "type": "object" }
+      }
+    },
+    "proxy": {
+      "type": "object",
+      "required": ["secretName"],
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "description": "Must stay 1 — GRANT_MAX_REQUESTS and other admin caps are per-replica in-memory."
+        },
+        "port": { "type": "integer" },
+        "secretName": { "type": "string", "minLength": 1 },
+        "resources": { "type": "object" },
+        "env": { "type": "object" }
+      }
+    }
+  }
+}

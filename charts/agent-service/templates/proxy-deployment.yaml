@@ -1,0 +1,60 @@
+# Plane A — the model-boundary gateway. The ONLY pod that holds the real token and the ONLY pod allowed
+# egress to the upstream model endpoint (enforced by templates/networkpolicy.yaml). Stateless -> can
+# scale, but the caps below are per-replica in-memory, so a hard global cap needs replicas kept at 1 or
+# the grants moved to shared state.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-proxy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+    app: {{ .Release.Name }}-proxy
+    plane: a
+spec:
+  # replicas MUST stay 1 — see values.yaml's own comment; GRANT_MAX_REQUESTS and other admin caps are
+  # per-replica in-memory.
+  replicas: {{ .Values.proxy.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-proxy
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-proxy
+        plane: a
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: proxy
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["uvicorn", "proxy:app", "--host", "0.0.0.0", "--port", {{ .Values.proxy.port | quote }}]
+          ports:
+            - containerPort: {{ .Values.proxy.port }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.proxy.secretName }}
+          env:
+            {{- range $key, $value := .Values.proxy.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.proxy.port }} }
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.proxy.port }} }
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.proxy.resources | nindent 12 }}

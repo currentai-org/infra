@@ -1,0 +1,66 @@
+# agent-service — two-plane deployment ported from agent-service's own deploy/k8s/*.yaml raw manifests.
+# Plane A (agent-proxy) holds the real model credential and is the only pod with upstream egress. Plane B
+# (agent-app) is per-task execution, credential-free — see templates/networkpolicy.yaml for the rules
+# that enforce that split. NetworkPolicy enforcement is NOT guaranteed on stock EKS — see chart README.
+
+image:
+  repository: ghcr.io/REPLACE_ME/agent-service
+  # :latest defeats the point of a staging->production promotion flow (nothing to diff or roll back).
+  # Real per-commit tags need to come from agent-service's own CI as separate follow-up work.
+  tag: latest
+  pullPolicy: IfNotPresent
+
+app:
+  # MUST stay 1 — enforced by values.schema.json (maximum: 1). The SQLite task store and the in-memory
+  # concurrency cap are both per-pod state. Scaling out needs a Postgres DSN swap first, not a replica
+  # bump — see agent-service's own docs.
+  replicas: 1
+  port: 8731
+  pvcSize: 1Gi
+  # Pre-existing Secret this Deployment references via envFrom — NOT created by this chart. See the
+  # chart README's "Before first sync" section.
+  secretName: agent-app
+  resources:
+    requests: {cpu: 250m, memory: 512Mi}
+    limits: {cpu: "2", memory: 2Gi}
+  env:
+    # Sovereign default: Apertus-1.5-70B driving Hermes' real loop directly.
+    # Released weights are swiss-ai/Apertus-v1.5-70B (Apache-2.0, 2026-07-24); the apertus-ai/ id below
+    # is the pre-release org's persistent k8s deployment on CSCS, the only route serving 1.5 without an
+    # expires_at. Switch when a durable swiss-ai/ deployment exists.
+    AGENT_MODEL: "apertus-ai/Apertus-v1.5-70B"
+    AGENT_MODEL_PROVIDER: "huggingface" # OpenAI-compatible wire format (works vs CSCS)
+    AGENT_COMPUTE_PROVIDER: "CSCS (preview)" # honest "what's running" provenance
+    AGENT_TOOLSETS: "coding" # read_file/write_file/patch/search_files + terminal
+    AGENT_BEST_OF: "3" # verify-gated retry (needs a verify spec on /run to engage)
+    AGENT_DB_PATH: "/data/tasks.db"
+    AGENT_SANDBOX: "bwrap" # fs-isolation; network egress enforced by NetworkPolicy
+    AGENT_SANDBOX_REQUIRED: "1" # fail closed if the sandbox can't start
+    AGENT_MAX_STEPS: "90"
+    AGENT_MAX_TOKENS: "200000" # per-task spend ceiling
+    AGENT_MAX_CONCURRENCY: "8"
+    AGENT_ACP: "1" # ACP transport; oneshot is the explicit per-request opt-out
+    AGENT_USER_DAILY_TOKENS: "2000000" # per-user 24h budget
+    AGENT_USER_DAILY_TASKS: "200"
+    # NOTE (found while porting, not fixed — out of scope for a faithful port): this points at a Service
+    # in the roost namespace, but neither this env var's target nor the original raw manifests' own
+    # NetworkPolicy grants agent-app egress there. Preserved as-is; worth agent-service confirming
+    # whether this is reached some other way or is currently a dead config value.
+    ROOST_MODERATION_URL: "http://roost-moderation.roost:8080/verdict"
+
+proxy:
+  # MUST stay 1 — enforced by values.schema.json (maximum: 1). GRANT_MAX_REQUESTS and other admin caps
+  # are per-replica in-memory; scaling needs those moved to shared state first.
+  replicas: 1
+  port: 8732
+  # Pre-existing Secret this Deployment references via envFrom — NOT created by this chart. See the
+  # chart README's "Before first sync" section.
+  secretName: agent-gateway
+  resources:
+    requests: {cpu: 100m, memory: 128Mi}
+    limits: {cpu: "1", memory: 512Mi}
+  env:
+    # Sovereign path: CSCS, the only route currently serving Apertus-1.5 (see app.env's AGENT_MODEL).
+    MODEL_PROVIDERS: "cscs"
+    PROVIDER_CSCS_BASE: "https://api.swissai.svc.cscs.ch/v1"
+    GRANT_MAX_REQUESTS: "200" # gateway-side hard ceiling (defense-in-depth)

@@ -33,3 +33,24 @@ ingresses:
       name: open-webui
       port: 80
 
+  # agent-app only — never agent-proxy, which holds the real model credential and must stay
+  # unreachable from outside the cluster (the chart's own NetworkPolicy already restricts its ingress
+  # to agent-app alone). healthcheck-path is required: agent-app's /healthz doesn't serve on `/`, so
+  # without it the ALB marks every target unhealthy.
+  - enabled: true
+    name: agent-service-ingress
+    namespace: agent-service
+    ingressClassName: alb
+    host: agent-service.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    targetService:
+      name: agent-service-app
+      port: 80
+

@@ -1,0 +1,73 @@
+# Plane B — the per-task execution service. Credential-free (no real model token; it gets a per-task
+# nonce from the proxy). Durable task store on a PVC so results + the per-user spend ledger survive
+# restarts.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+    app: {{ .Release.Name }}-app
+    plane: b
+spec:
+  # replicas MUST stay 1 — see values.yaml's own comment; the SQLite task store and the in-memory
+  # concurrency cap below are both per-pod state.
+  replicas: {{ .Values.app.replicas }}
+  strategy:
+    type: Recreate # single RWO volume + per-pod state -> no rolling overlap
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app
+        plane: b
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # default CMD = uvicorn app:app --port {{ .Values.app.port }}
+          ports:
+            - containerPort: {{ .Values.app.port }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.app.secretName }}
+          env:
+            # Talk to Plane A by its in-chart Service name — never upstream directly.
+            - name: AGENT_MODEL_PROXY_URL
+              value: "http://{{ .Release.Name }}-proxy:{{ .Values.proxy.port }}"
+            {{- range $key, $value := .Values.app.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          # bwrap needs user-namespace cloning; it drops privileges itself. No NET_ADMIN — egress is the
+          # NetworkPolicy's job, not the container's (see templates/networkpolicy.yaml — confirm the
+          # cluster's CNI actually enforces NetworkPolicy before relying on it as the exfil control).
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.app.port }} }
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.app.port }} }
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-app-data
