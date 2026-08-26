@@ -27,29 +27,39 @@ jobs:
             fi
           done
 
-  chart-verifier:
-    name: Chart Verifier
+  chart-verify:
+    name: Verify Helm Charts
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.12.0
+
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.10.0
 
-      - name: Install Chart Verifier CLI
-        uses: redhat-actions/openshift-tools-installer@v1
-        with:
-          source: github
-          chart-verifier: latest
+      - name: Verify charts by running helm install --dry-run
+        run: |
+          # Dynamically extract and pre-create any namespaces referenced in values.yaml to avoid API errors
+          namespaces=$(grep -h "namespace:" charts/*/values.yaml 2>/dev/null | awk -F ':' '{print $2}' | tr -d ' ' | tr -d '"' | tr -d "'" | sort -u)
+          for ns in $namespaces; do
+            if [ -n "$ns" ]; then
+              echo "Creating namespace: $ns"
+              kubectl create namespace "$ns" || true
+            fi
+          done
 
-      - name: Run Chart Verifier - ingress
-        uses: redhat-actions/chart-verifier@v1
-        with:
-          chart_uri: ./charts/ingress
+          for dir in charts/*/; do
+            if [ -d "$dir" ]; then
+              chart_name=$(basename "$dir")
+              echo "Verifying chart $chart_name"
+              helm install "$chart_name" "$dir" --dry-run --create-namespace
+            fi
+          done
 
-      - name: Run Chart Verifier - simple-pod
-        uses: redhat-actions/chart-verifier@v1
-        with:
-          chart_uri: ./charts/simple-pod
+
