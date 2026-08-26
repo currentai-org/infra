@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/currentai-org/infra'
-    targetRevision: dev
+    targetRevision: main
     path: charts/ingress
     helm:
       valueFiles:

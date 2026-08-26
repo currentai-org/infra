@@ -1,13 +1,18 @@
 # Ingress configuration for web services
-domain: publicai.co
+# Note: This values.yaml is only an EXAMPLE.
+# These values are completely overwritten by the environment-specific values in:
+#   - Staging: argo/environments/staging/ingress-values.yaml
+#   - Production: argo/environments/production/ingress-values.yaml
+
+domain: currentai.org
 certificateArn: ""
 
 ingresses:
   - enabled: true
-    name: web-public-ingress
-    namespace: chat
+    name: example-user-application-ingress
+    namespace: example-namespace
     ingressClassName: alb
-    host: chat.{{ .Values.domain }}
+    host: user-app.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
@@ -16,14 +21,14 @@ ingresses:
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: public-group
     targetService:
-      name: openwebui-service
+      name: user-application-service
       port: 8080
 
   - enabled: true
-    name: litellm-public-ingress
-    namespace: platform
+    name: example-api-service-ingress
+    namespace: example-namespace
     ingressClassName: alb
-    host: api-internal.{{ .Values.domain }}
+    host: api-service.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
@@ -32,14 +37,14 @@ ingresses:
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: api-group
     targetService:
-      name: litellm-service
+      name: api-service
       port: 4000
 
   - enabled: true
-    name: lago-public-ingress
-    namespace: platform
+    name: example-admin-application-ingress
+    namespace: example-namespace
     ingressClassName: alb
-    host: lago.{{ .Values.domain }}
+    host: admin-app.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
@@ -48,74 +53,7 @@ ingresses:
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: admin-group
     targetService:
-      name: platform-front-svc
-      port: 80
-
-  - enabled: true
-    name: lago-api-ingress
-    namespace: platform
-    ingressClassName: alb
-    host: lago-api.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/healthcheck-path: /health
-      alb.ingress.kubernetes.io/group.name: api-group
-    targetService:
-      name: platform-api-svc
-      port: 3000
-
-  - enabled: true
-    name: argo-ingress
-    namespace: argocd
-    ingressClassName: alb
-    host: argo.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin-group
-    targetService:
-      name: argocd-server
-      port: 80
-
-  # Grafana Dashboard UI
-  - enabled: true
-    name: grafana-ingress
-    namespace: monitoring
-    ingressClassName: alb
-    host: grafana.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin-group
-    targetService:
-      name: grafana
-      port: 80
-
-  # Prometheus Server UI
-  - enabled: true
-    name: prometheus-ingress
-    namespace: monitoring
-    ingressClassName: alb
-    host: prometheus.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin-group
-    targetService:
-      name: prometheus-server
+      name: admin-application-service
       port: 80
 
 # Certificate ARN (passed from command line)
