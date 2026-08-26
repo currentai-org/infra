@@ -1,4 +1,4 @@
-# Infrastructure Repository
+# Current AI Infrastructure Repository
 
 This repository contains the Helm charts and Argo CD application definitions for our services.
 
@@ -24,6 +24,9 @@ All changes pushed to this repository are automatically deployed to their respec
 
 To view the deployment status and sync states, visit:
 👉 **[argo.ai-staging.chat](https://argo.ai-staging.chat)**
+
+To view the OpenWeb UI, visit:
+👉 **[potluckchat.ai-staging.chat](https://potluckchat.ai-staging.chat)**
 
 ## Git Workflow
 

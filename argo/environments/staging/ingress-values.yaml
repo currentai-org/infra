@@ -1,5 +1,8 @@
 domain: ai-staging.chat
-# Please add any new service to the alb.ingress.kubernetes.io/group.name: public so that they can all share a load balancee in AWS
+
+# Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
+# Please do not add other ingress groups names, they will create new load balancers.
+
 ingresses:
   - enabled: true
     name: simple-pod-ingress
@@ -16,3 +19,20 @@ ingresses:
     targetService:
       name: simple-pod-service
       port: 80
+
+  - enabled: true
+    name: open-webui-ingress
+    namespace: experiment
+    ingressClassName: alb
+    host: potluckchat.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+    targetService:
+      name: open-webui
+      port: 80
+
