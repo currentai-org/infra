@@ -38,6 +38,12 @@ jobs:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.10.0
 
+      - name: Install Chart Verifier CLI
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          source: github
+          chart-verifier: latest
+
       - name: Run Chart Verifier - ingress
         uses: redhat-actions/chart-verifier@v1
         with:
