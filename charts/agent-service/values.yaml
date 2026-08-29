@@ -4,7 +4,7 @@
 # that enforce that split. NetworkPolicy enforcement is NOT guaranteed on stock EKS — see chart README.
 
 image:
-  repository: ghcr.io/REPLACE_ME/agent-service
+  repository: ghcr.io/currentai-org/agent-service
   # :latest defeats the point of a staging->production promotion flow (nothing to diff or roll back).
   # Real per-commit tags need to come from agent-service's own CI as separate follow-up work.
   tag: latest

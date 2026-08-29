@@ -8,7 +8,10 @@ Public AI's sovereign agent API, two planes in one chart — ported from agent-s
 - **agent-app** (Plane B) — per-task execution. Credential-free; gets a per-task nonce from the proxy,
   runs the sandboxed agent loop, stores results on a PVC.
 
-See agent-service's own `deploy/README.md` for the design rationale behind the split.
+See agent-service's own `deploy/README.md` for the design rationale behind the split. agent-service
+now lives as a subdirectory (`agent-service/`) inside the `currentai-org/aipotluck.org` monorepo, not
+as its own standalone repo — every `agent-service/...` path this README references is relative to
+that repo's root.
 
 ## Before first sync
 
@@ -34,7 +37,7 @@ should be blocked.
 
 | Key                                  | Description                                                                                                                     | Default                          |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| `image.repository`                    | Container image repo                                                                                                              | `ghcr.io/REPLACE_ME/agent-service` |
+| `image.repository`                    | Container image repo                                                                                                              | `ghcr.io/currentai-org/agent-service` |
 | `image.tag`                           | Container image tag — `:latest` defeats staging→production promotion (nothing to diff or roll back); real per-commit tags need to come from agent-service's own CI | `latest`                          |
 | `image.pullPolicy`                    |                                                                                                                                     | `IfNotPresent`                    |
 | `app.replicas` / `proxy.replicas`     | **Must stay 1** — enforced by `values.schema.json` (`maximum: 1`). The SQLite task store and in-memory concurrency/admin caps are per-pod state | `1`                                |
