@@ -1,5 +1,8 @@
 domain: aipotluck.org
 
+# Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
+# Please do not add other ingress groups names, they will create new load balancers.
+
 ingresses:
   - enabled: true
     name: simple-pod-ingress
