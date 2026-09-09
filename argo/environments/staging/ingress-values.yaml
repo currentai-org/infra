@@ -1,14 +1,18 @@
-domain: ai-staging.chat
+domain: stg.aipotluck.org
 
 # Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
 # Please do not add other ingress groups names, they will create new load balancers.
 
 ingresses:
+  # agent-app only — never agent-proxy, which holds the real model credential and must stay
+  # unreachable from outside the cluster (the chart's own NetworkPolicy already restricts its ingress
+  # to agent-app alone). healthcheck-path is required: agent-app's /healthz doesn't serve on `/`, so
+  # without it the ALB marks every target unhealthy.
   - enabled: true
-    name: simple-pod-ingress
-    namespace: experiment
+    name: agent-service-ingress
+    namespace: agent-service
     ingressClassName: alb
-    host: simple-pod.{{ .Values.domain }}
+    host: agent-service.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
@@ -16,23 +20,8 @@ ingresses:
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
     targetService:
-      name: simple-pod-service
-      port: 80
-
-  - enabled: true
-    name: open-webui-ingress
-    namespace: experiment
-    ingressClassName: alb
-    host: potluckchat.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-public
-    targetService:
-      name: open-webui
+      name: agent-service-app
       port: 80
 

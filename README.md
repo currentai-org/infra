@@ -25,9 +25,6 @@ All changes pushed to this repository are automatically deployed to their respec
 To view the deployment status and sync states, visit:
 👉 **[argo.ai-staging.chat](https://argo.ai-staging.chat)**
 
-To view the OpenWeb UI, visit:
-👉 **[potluckchat.ai-staging.chat](https://potluckchat.ai-staging.chat)**
-
 ## Git Workflow
 
 To make changes or add something new:
@@ -36,3 +33,7 @@ To make changes or add something new:
 2. **Pull Request to Dev**: Submit a PR back to the `dev` branch and merge. This automatically deploys the changes to the **Staging Cluster**.
 3. **QA & Release**: Once QA verification passes, merge the `dev` branch into the `main` branch to release the changes to the **Production Cluster**.
 
+Secrets must come in via ESO - doppler single secret - staging and prod name /project-name
+cloudflare connection to load balancer
+Need to set up DNS
+S3 and Postgres need terraform

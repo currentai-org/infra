@@ -1,0 +1,116 @@
+# NETWORK EGRESS ENFORCEMENT — the half of the agent-exfil control bwrap can't do unprivileged. The app
+# (Plane B) gets a per-task nonce and runs an untrusted agent loop; without this it could reach anywhere.
+# Here its ONLY egress is DNS + the gateway. The gateway (Plane A) is the single controlled exit to
+# upstream.
+#
+# Requires a NetworkPolicy-enforcing CNI. Stock EKS with the default AWS VPC CNI does NOT enforce
+# NetworkPolicy objects unless the VPC CNI's network-policy feature (or Calico/Cilium) is explicitly
+# enabled — applying this without that confirmed means it silently does nothing. Verify before trusting
+# it: run a scratch pod in this namespace and confirm egress to an arbitrary external IP is blocked.
+---
+# Baseline: deny ALL egress in the namespace; the policies below re-open the minimum each plane needs.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-default-deny-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes: ["Egress"]
+---
+# Plane B (app): egress ONLY to DNS + the gateway Service. No direct internet — so the sandboxed agent
+# cannot exfil data to an arbitrary host; its sole outbound path is the metered, secret-swapping proxy.
+# (Ported as-is from the original manifests: this does not grant egress to ROOST_MODERATION_URL's
+# `roost` namespace — worth agent-service confirming separately whether that's reached another way.)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-app-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+    - to:
+        - podSelector:
+            matchLabels:
+              app: {{ .Release.Name }}-proxy
+      ports:
+        - { protocol: TCP, port: {{ .Values.proxy.port }} }
+---
+# Plane A (proxy): egress to DNS + upstream HTTPS only. This is the one controlled exit. CIDR excludes
+# cluster-private ranges so the token-holding pod can't be pivoted into internal services; tighten to
+# the upstream provider's egress gateway / domain allowlist in production if the provider's IPs are
+# stable enough to pin.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-proxy-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-proxy
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16"]
+      ports:
+        - { protocol: TCP, port: 443 }
+---
+# NOTE (no policy below for this): agent-app itself has no Ingress-direction NetworkPolicy, unlike the
+# proxy. That's new exposure this PR introduces, not something ported unchanged — the raw manifests
+# this was templated from never had a public Ingress in front of agent-app at all. A podSelector-based
+# rule wouldn't actually restrict the new ALB traffic anyway (target-type: ip sends traffic from the
+# ALB's own ENIs, not from something matching an in-cluster pod identity), so the real gate for this
+# path is an AWS Security Group on the ALB/target group — outside what this chart controls — plus the
+# app's own JWT check. Worth Sean confirming the target group's security group before this sees real
+# traffic; a NetworkPolicy here would be a false sense of restriction, not a real one.
+
+# Ingress: ONLY the app may reach the gateway admin/model API (nonces are app-issued; nobody else
+# grants).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-proxy-ingress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agent-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-proxy
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Release.Name }}-app
+      ports:
+        - { protocol: TCP, port: {{ .Values.proxy.port }} }
