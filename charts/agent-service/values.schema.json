@@ -44,6 +44,21 @@
         "resources": { "type": "object" },
         "env": { "type": "object" }
       }
+    },
+    "externalSecret": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "refreshInterval": { "type": "string" },
+        "secretStoreRef": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "kind": { "type": "string" }
+          }
+        },
+        "remoteKey": { "type": "string" }
+      }
     }
   }
 }

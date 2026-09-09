@@ -12,10 +12,11 @@ See agent-service's own `deploy/README.md` for the design rationale behind the s
 
 ## Before first sync
 
-Two Secrets must exist in the target namespace before this chart is installed — it only *references*
-them (`envFrom.secretRef`), it never creates them, so Argo's `selfHeal` can't fight a manually-created
-real secret on the next reconcile:
+Two Secrets must exist in the target namespace before this chart is installed — it references
+them (`envFrom.secretRef`). With ESO enabled (`externalSecret.enabled: true`), the chart automatically
+creates `ExternalSecret` resources to pull secrets from AWS Secrets Manager via `ClusterSecretStore` (default `/agent-service`).
 
+If managing secrets manually instead:
 - `agent-app` (or your override of `app.secretName`) — needs `PROXY_ADMIN_KEY`, `WEBUI_SECRET_KEY`
 - `agent-gateway` (or your override of `proxy.secretName`) — needs `PROVIDER_CSCS_TOKEN`,
   `PROXY_ADMIN_KEY` (must match the app's copy)

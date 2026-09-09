@@ -1,0 +1,10 @@
+image:
+  repository: ghcr.io/currentai-org/agent-service
+  tag: 0.0.1-test
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: ClusterSecretStore
+  remoteKey: /agent-service

@@ -12,6 +12,7 @@ spec:
     helm:
       valueFiles:
         - values.yaml
+        - ../../argo/environments/staging/agent-service-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: agent-service
