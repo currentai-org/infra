@@ -4,9 +4,10 @@
 # that enforce that split. NetworkPolicy enforcement is NOT guaranteed on stock EKS — see chart README.
 
 image:
-  repository: ghcr.io/currentai-org/agent-service
-  tag: 0.0.1-test
-  pullPolicy: IfNotPresent
+  repository: 818561370924.dkr.ecr.us-east-1.amazonaws.com/agent-service
+  tag: latest
+  pullPolicy: Always
+
 
 externalSecret:
   enabled: true
