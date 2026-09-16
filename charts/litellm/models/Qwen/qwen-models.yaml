@@ -7,6 +7,8 @@ models:
     drop_params: true 
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: Qwen3.5-122B-A10B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-122B-A10B:deepinfra
@@ -14,6 +16,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: Qwen3-235B-A22B-Thinking-2507
   litellm_params:
     model: huggingface/Qwen/Qwen3-235B-A22B-Thinking-2507:deepinfra
@@ -21,6 +25,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: Qwen3.5-4B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-4B:featherless-ai
@@ -28,6 +34,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: Qwen3.5-35B-A3B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-35B-A3B:deepinfra
@@ -35,6 +43,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: Qwen3.5-9B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-9B:together
@@ -42,4 +52,5 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
-
+  model_info:
+    access_groups: ["public", "private"]

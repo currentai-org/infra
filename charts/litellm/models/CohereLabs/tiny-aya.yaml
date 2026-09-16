@@ -7,6 +7,8 @@ models:
     drop_params: true 
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: tiny-aya-earth
   litellm_params:
     model: huggingface/CohereLabs/tiny-aya-earth:cohere
@@ -14,6 +16,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: tiny-aya-water
   litellm_params:
     model: huggingface/CohereLabs/tiny-aya-water:cohere
@@ -21,6 +25,8 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["public", "private"]
 - model_name: tiny-aya-fire
   litellm_params:
     model: huggingface/CohereLabs/tiny-aya-fire:cohere
@@ -28,4 +34,5 @@ models:
     api_key: os.environ/HF_TOKEN
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
-
+  model_info:
+    access_groups: ["public", "private"]

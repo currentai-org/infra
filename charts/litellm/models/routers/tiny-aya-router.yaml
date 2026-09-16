@@ -22,3 +22,5 @@ models:
         MEDIUM: tiny-aya-earth
         COMPLEX: tiny-aya-fire
         REASONING: tiny-aya-global
+  model_info:
+    access_groups: ["public", "private"]

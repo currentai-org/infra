@@ -22,6 +22,8 @@ models:
         MEDIUM: tiny-aya-earth
         COMPLEX: tiny-aya-fire
         REASONING: command-a-plus
+  model_info:
+    access_groups: ["public", "private"]
     # AIYA
     # SEA-LION
     # APERTUS
