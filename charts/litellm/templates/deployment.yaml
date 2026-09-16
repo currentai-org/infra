@@ -84,6 +84,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: featherless_api_key
                   optional: true
+            - name: NEXBIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: nexbit_api_key
+                  optional: true
             - name: HF_TOKEN
               valueFrom:
                 secretKeyRef:
