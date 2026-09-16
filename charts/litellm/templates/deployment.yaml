@@ -104,10 +104,6 @@ spec:
               mountPath: /app/config.yaml
               subPath: config.yaml
               readOnly: true
-            - name: custom-auth-volume
-              mountPath: /app/custom_auth.py
-              subPath: custom_auth.py
-              readOnly: true
 
           ports:
             - containerPort: {{ .Values.app.port }}
@@ -117,6 +113,3 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Values.app.name }}-config
-        - name: custom-auth-volume
-          configMap:
-            name: {{ .Values.app.name }}-custom-auth

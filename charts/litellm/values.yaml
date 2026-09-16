@@ -7,7 +7,7 @@ app:
   image:
     repository: docker.litellm.ai/berriai/litellm
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   replicas: 1
   minReadySeconds: 20
   port: 4000
