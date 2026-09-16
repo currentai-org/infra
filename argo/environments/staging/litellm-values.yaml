@@ -5,7 +5,7 @@ global:
 
 secrets:
   name: litellm-secrets
-  manualSecretsName: staging/aichat/router-aipotluck-org
+  manualSecretsName: /router-aipotluck-org
   managedSecretsName: staging/aichat/open-webui/managed-secrets
   dbPasswordArn: staging/aichat/database/password
 
