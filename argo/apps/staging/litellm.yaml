@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: litellm
+  name: currentai-router
   namespace: argocd
 spec:
   project: default
