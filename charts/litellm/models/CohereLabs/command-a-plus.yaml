@@ -1,0 +1,8 @@
+models:
+- model_name: command-a-plus
+  litellm_params:
+    model: CohereLabs/command-a-plus-05-2026-w4a4:cohere
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"

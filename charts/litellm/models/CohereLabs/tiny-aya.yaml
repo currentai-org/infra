@@ -1,0 +1,31 @@
+models:
+- model_name: tiny-aya-global
+  litellm_params:
+    model: huggingface/CohereLabs/tiny-aya-global:cohere
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    drop_params: true 
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+- model_name: tiny-aya-earth
+  litellm_params:
+    model: huggingface/CohereLabs/tiny-aya-earth:cohere
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+- model_name: tiny-aya-water
+  litellm_params:
+    model: huggingface/CohereLabs/tiny-aya-water:cohere
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+- model_name: tiny-aya-fire
+  litellm_params:
+    model: huggingface/CohereLabs/tiny-aya-fire:cohere
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+
