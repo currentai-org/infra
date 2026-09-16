@@ -1,0 +1,9 @@
+models:
+- model_name: ALIA-40b-instruct
+  litellm_params:
+    model: openai/alia-salamandra:40b
+    api_base: https://api.nextbit256.com/v1
+    api_key: os.environ/NEXBIT_API_KEY
+    supports_vision: true
+  model_info:
+    access_groups: ["public", "private"]
