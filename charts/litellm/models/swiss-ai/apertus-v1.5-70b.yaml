@@ -14,19 +14,3 @@ models:
     max_tokens: 8192
   model_info:
     access_groups: ["public", "private"]
-#- model_name: swiss-ai/apertus-v1.5-70b
-#  litellm_params:
-#    model: openai/swiss-ai/Apertus-v1.5-70B
-#    api_base: https://api.inference.cscs.ch/v1
-#    api_key: os.environ/CSCS_API_KEY
-#    ssl_verify: false
-#    supports_vision: true
-#    weight: 20
-#    temperature: 0.8
-#    top_p: 0.9
-#    max_tokens: 16384
-#  model_info:
-#    access_groups: ["public", "private"]
-# fallbacks:
-# - aisingapore/Qwen-SEA-LION-v4-32B-IT
-# - speakleash/Bielik-11B-v3.0-Instruct
