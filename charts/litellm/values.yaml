@@ -9,7 +9,7 @@ app:
     tag: v1.99.0
     pullPolicy: IfNotPresent
   replicas: 1
-  minReadySeconds: 20
+  minReadySeconds: 35
   port: 4000
   resources:
     requests:
