@@ -12,9 +12,13 @@ metadata:
     app: {{ .Release.Name }}-proxy
     plane: a
 spec:
-  # replicas MUST stay 1 — see values.yaml's own comment; GRANT_MAX_REQUESTS and other admin caps are
-  # per-replica in-memory.
   replicas: {{ .Values.proxy.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  minReadySeconds: 30
   selector:
     matchLabels:
       app: {{ .Release.Name }}-proxy

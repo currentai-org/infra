@@ -15,7 +15,11 @@ spec:
   # concurrency cap below are both per-pod state.
   replicas: {{ .Values.app.replicas }}
   strategy:
-    type: Recreate # single RWO volume + per-pod state -> no rolling overlap
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  minReadySeconds: 30
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
