@@ -1,0 +1,77 @@
+global:
+  namespace: router
+  environment: staging
+
+app:
+  name: litellm
+  image:
+    repository: docker.litellm.ai/berriai/litellm
+    tag: v1.99.0
+    pullPolicy: IfNotPresent
+  replicas: 1
+  minReadySeconds: 35
+  port: 4000
+  resources:
+    requests:
+      memory: 3Gi
+      cpu: 300m
+    limits:
+      memory: 4Gi
+      cpu: 1000m
+service:
+  name: litellm-service
+  type: ClusterIP
+  port: 4000
+  targetPort: 4000
+serviceAccount:
+  enabled: true
+  name: litellm-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::901779868336:role/AmazonEKS_LiteLLM_Role
+config:
+  litellm_settings:
+    num_retries: 5
+    allowed_fails: 1
+    cooldown_time: 30
+    cache: true
+    require_auth_for_metrics_endpoint: false
+    cache_params:
+      type: redis
+      namespace: litellm.caching
+      ttl: 600
+secrets:
+  name: litellm-secrets
+  manualSecretsName: ""
+  managedSecretsName: ""
+  dbPasswordArn: ""
+
+
+# Environment variables
+env:
+  aws_region: us-east-1
+  litellmRedisPort: '6379'
+  litellmRedisNamespace: litellm
+router:
+  routingStrategy: latency-based-routing
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 85
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+
+prometheus:
+  enabled: false

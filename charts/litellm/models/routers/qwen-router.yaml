@@ -1,0 +1,37 @@
+models:
+  - model_name: smart-qwen
+    litellm_params:
+      model: auto_router/complexity_router
+      drop_params: true
+      complexity_router_config:
+        classifier_type: heuristic
+        complexity_router_default_model: Qwen3.8-27B
+        tiers:
+          SIMPLE:
+            - Qwen3.5-35B-A3B
+          MEDIUM:
+            - Qwen3.8-27B
+          COMPLEX:
+            - Qwen3.5-122B-A10B
+          REASONING:
+            - Qwen3-235B-A22B-Thinking-2507
+    model_info:
+      access_groups: ["public", "private"]
+  - model_name: mini-qwen
+    litellm_params:
+      model: auto_router/complexity_router
+      drop_params: true
+      complexity_router_config:
+        classifier_type: heuristic
+        complexity_router_default_model: Qwen3.5-9B
+        tiers:
+          SIMPLE:
+            - Qwen3.5-4B
+          MEDIUM:
+            - Qwen3.5-9B
+          COMPLEX:
+            - Qwen3.5-35B-A3B
+          REASONING:
+            - Qwen3.8-27B
+    model_info:
+      access_groups: ["public", "private"]

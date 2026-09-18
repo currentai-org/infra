@@ -1,0 +1,26 @@
+models:
+- model_name: mini-language
+  litellm_params:
+    model: auto_router/complexity_router
+    drop_params: true
+    complexity_router_default_model: tiny-aya-global
+    complexity_router_config:
+      classifier_type: llm
+      classifier_fallback: default_model
+      classifier_llm_config:
+        model: tiny-aya-global
+        timeout_ms: 3000
+        system_prompt: |
+          You are a language detection classifier. Analyze the input prompt and determine the language family or geographic region:
+          - Reply "MEDIUM" if the text is primarily in West Asian or African languages (e.g. Arabic, Hebrew, Persian, Turkish, Swahili, Amharic, Yoruba, Hausa, Zulu, etc.).
+          - Reply "SIMPLE" if the text is primarily in European or Asia-Pacific languages (e.g. English, Spanish, French, German, Russian, Mandarin, Cantonese, Japanese, Korean, Vietnamese, Indonesian, Tagalog, etc.).
+          - Reply "COMPLEX" if the text is primarily in South Asian languages (e.g. Hindi, Bengali, Urdu, Punjabi, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam, Odia, Nepali, Sinhala, etc.).
+          - Reply "REASONING" for any other language, mixed languages, or if you cannot determine the language.
+          Return ONLY JSON with the format: {"tier": "<TIER>"}
+      tiers:
+        SIMPLE: tiny-aya-water
+        MEDIUM: tiny-aya-earth
+        COMPLEX: tiny-aya-fire
+        REASONING: tiny-aya-global
+  model_info:
+    access_groups: ["public", "private"]
