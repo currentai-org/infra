@@ -23,12 +23,29 @@ spec:
   ingressClassName: {{ .ingressClassName | default "alb" }}
   rules:
   {{- if .host }}
-  - host: {{ tpl .host $ }}
+  {{- /* Quoted: an unquoted leading "*" (a wildcard host, e.g. "*.tunnel.example.com") is YAML's
+    alias indicator, not a literal character -- an unquoted wildcard host breaks parsing. */}}
+  - host: {{ tpl .host $ | quote }}
     http:
   {{- else }}
   - http:
   {{- end }}
       paths:
+      {{- if .paths }}
+      {{- /* Multi-path entry: for routing a single host to more than one backend by path (e.g. a
+        dashboard whose UI and API live on different ports). Longest-prefix wins per the Ingress
+        spec, so listed order doesn't affect matching -- list the more specific path first anyway,
+        for readability. */}}
+      {{- range .paths }}
+      - path: {{ .path | default "/" }}
+        pathType: {{ .pathType | default "Prefix" }}
+        backend:
+          service:
+            name: {{ .targetService.name }}
+            port:
+              number: {{ .targetService.port }}
+      {{- end }}
+      {{- else }}
       - path: /
         pathType: Prefix
         backend:
@@ -36,5 +53,6 @@ spec:
             name: {{ .targetService.name }}
             port:
               number: {{ .targetService.port }}
+      {{- end }}
 {{- end }}
 {{- end }}

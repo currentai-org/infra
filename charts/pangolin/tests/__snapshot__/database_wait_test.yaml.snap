@@ -1,0 +1,9 @@
+renders wait-for-db initContainer in multi mode for cloudnativepg (default):
+  1: |
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 65534
