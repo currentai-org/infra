@@ -206,6 +206,63 @@ Load Balancer Controller and has none of that, and installing a second, cluster-
 controller is out of scope for onboarding one service. `standalone` (this chart running its own
 Traefik, patched per B1 above) keeps the footprint to one namespace.
 
+**Re-checked directly, not assumed: `deployment.installTraefikController`/`traefikController` do not
+make `controller` mode self-contained.** Those keys exist in `values.yaml` ("Values passed to the
+Traefik dependency chart") but no `traefik` entry exists in `Chart.yaml`'s `dependencies:` and no
+`.tgz` for one exists in `charts/pangolin/charts/` — they are unwired stubs in this release. Choosing
+`controller` mode would mean separately installing and operating a cluster-wide Traefik ingress
+controller ourselves (new CRDs, a new controller pod, a second ingress path parallel to the ALB
+Ingress Controller everything else in this fleet uses) — a bigger commitment than B1's patch, not a
+smaller one. This is why `standalone` + the patch stays the answer even after explicitly looking for a
+zero-patch alternative.
+
+## The values overlay: every line was checked against the chart's own default, not assumed necessary
+
+The overlay originally carried about 40 keys. Diffed line by line against `charts/pangolin/values.yaml`
+(not from memory), roughly half turned out to already equal the chart's own default and did nothing —
+`database.mode`, `pangolin.replicaCount`, `pangolin.config.flags.disable_signup_without_invite`,
+`traefik.config.logLevel`, `networkPolicy.enabled`, `gerbil.persistence.*`, `controller.enabled`, and
+more. Removed rather than left in as documentation, on purpose: a line that restates today's default
+also pins the fleet to today's default forever, silently, since nobody notices a "redundant" line stop
+matching a moved upstream default. Omitting it means a future chart bump's default is what actually
+ships, which is the more honest failure mode — a real behavior change from an upstream bump should be
+visible in a `helm template` diff, not hidden behind a value we happened to already agree with.
+
+Two real findings came out of that check, not just a smaller file:
+
+- **`networkPolicy.pangolin.externalIngress.integration` defaults to `false`.** A comment in an
+  earlier draft of this overlay flagged the risk and then never actually set the override — confirmed
+  by reading `templates/networkpolicy.yaml:109` directly: the Integration API's ingress rule (port
+  3003) is gated on this key **and** `pangolin.config.flags.enable_integration_api`, both true. Without
+  it, the one path Vercel actually calls would have been silently blocked by the chart's own
+  NetworkPolicy despite `enable_integration_api: true` being set. Fixed, not just trimmed.
+- **Pinning `images.pangolin.tag` explicitly was silently defeating the chart's own postgresql-image
+  selection.** `_helpers.tpl:371-384` (`pangolin.image`): when `images.pangolin.tag` is unset **and**
+  `database.mode != sqlite`, the chart automatically resolves to the Postgres-capable image
+  (`images.pangolinPostgresql`, tag `postgresql-<AppVersion>`) instead of the plain one — a real,
+  documented mechanism (`values.yaml:372`: "Used automatically when database.mode is not sqlite unless
+  images.pangolin.tag or images.pangolin.digest is set"). The prior overlay's explicit
+  `images.pangolin.tag: "1.23.0"` bypassed that entirely and would have deployed the **non-Postgres**
+  pangolin image against the CNPG backend this overlay runs. Dropping the override (in favor of the
+  chart's own stock version, per the decision below) fixed this as a side effect — confirmed by
+  re-rendering and diffing: the image changed from `fosrl/pangolin:1.23.0` to
+  `fosrl/pangolin:postgresql-1.18.3`.
+
+**Decision: run the chart's stock `pangolin`/`traefik` image versions (1.18.3 / v3.6.15), not the
+1.23.0 / v3.7 that CUR-1266's local Compose stack validated.** Staging doesn't need the bleeding edge,
+and stock is one fewer thing to re-verify on every upstream chart bump. This does reopen the "5 minors
+of appVersion drift" risk from the "Upstream chart" section of the companion plan — the `ssl: true`
+forcing and `P-Access-Token` header behavior this feature depends on were only confirmed live at
+1.23.0. Treat the first real sync's end-to-end pairing test as the check that closes this, not
+something to assume passes because it worked locally at a different version.
+
+**`images.gerbil.tag` is the one image kept as an explicit override**, pinned to `"1.3.1"` — which
+happens to equal the chart's own current default, but written out on purpose rather than left implicit.
+Gerbil holds every paired device's WireGuard state; its version should never silently move under an
+unrelated chart bump the way an omitted default would. `"latest"` (what the overlay carried before this
+pass, to match local dev's `fosrl/gerbil:latest`) was dropped for the same reason applied more broadly:
+it isn't a version, it's an unpinned floor that means a different image on every re-pull.
+
 ## CloudNativePG comes bundled, not as a separate Application
 
 An earlier draft of the staging rollout plan (written before this chart was actually fetched and

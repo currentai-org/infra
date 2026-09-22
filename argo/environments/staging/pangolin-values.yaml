@@ -1,6 +1,12 @@
 # Staging values overlay for charts/pangolin (vendored fosrl/helm-charts @ pangolin-0.1.0-alpha.1,
 # patched -- see charts/pangolin/LOCAL-PATCHES.md for what's different from upstream and why).
 #
+# Every key below is a real divergence from the chart's own default -- verified line by line against
+# charts/pangolin/values.yaml, not assumed. A key that already matched the chart's default was left
+# out entirely rather than restated (e.g. database.mode is already "cloudnativepg", networkPolicy is
+# already enabled, pangolin.replicaCount is already 1) -- if a future upstream bump changes one of
+# those defaults, this overlay inherits the new default rather than silently overriding it back.
+#
 # Hostnames (see argo/environments/staging/ingress-values.yaml for the Ingress side):
 #   pangolin.stg.aipotluck.org      -> dashboard (currentai-admin ALB group) + newt's control channel
 #   pangolin-api.stg.aipotluck.org  -> Integration API, what Vercel calls (currentai-public ALB group)
@@ -16,55 +22,46 @@ deployment:
   type: standalone # no cluster-wide Traefik/CRDs -- see LOCAL-PATCHES.md B1
   mode: single # Traefik needs gerbil's network namespace to reach the WireGuard interface -- B3
 
-namespace:
-  create: false # the Application's managedNamespaceMetadata carries the PSA labels instead
-
-# -----------------------------------------------------------------------------
-# Images -- pin to what CUR-1266's local Compose stack actually validated end-to-end, not the
-# chart's own older defaults (pangolin 1.18.3, an unpinned gerbil/traefik tag). Digests recorded in
-# the plan for anyone who wants to re-verify: `docker inspect` against a locally running container.
-# -----------------------------------------------------------------------------
 images:
-  pangolin:
-    tag: "1.23.0"
   gerbil:
-    tag: "latest" # gerbil has no stable version tags upstream at time of writing; pin to a digest
-    # once fosrl/gerbil starts publishing them -- see LOCAL-PATCHES.md.
-  traefik:
-    tag: "v3.7"
+    # Written out explicitly rather than left on the chart's own default (currently also 1.3.1) --
+    # gerbil holds every device's WireGuard state, so its version should never silently move under an
+    # unrelated chart bump. Never "latest": that isn't a version, it's "whatever was current the day
+    # someone last ran `docker pull`," and it's not reproducible between environments or re-syncs.
+    tag: "1.3.1"
+# pangolin/traefik images are left at the chart's own stock tags (1.18.3 / v3.6.15) rather than
+# pinned to what CUR-1266's local Compose stack validated (1.23.0 / v3.7) -- staging doesn't need the
+# bleeding edge, and stock is one fewer thing to re-verify on every upstream chart bump. If the config
+# schema or the ssl:true / P-Access-Token behavior this feature depends on turns out to differ at
+# 1.18.3, that's a real finding for the first sync to surface, not something to pre-empt here.
 
 # -----------------------------------------------------------------------------
 # Database: CloudNativePG, bundled as this chart's own subchart dependency (charts/cloudnative-pg
 # aliased cnpg-operator, charts/cluster aliased cnpg-cluster) -- NOT a separate ArgoCD Application.
-# Both default to disabled; flipping them on is the only change this overlay needs to make, since
-# database.cloudnativepg.cluster.name (pangolin-db) already matches cnpg-cluster.fullnameOverride's
-# own default. See LOCAL-PATCHES.md for why this superseded the original multi-source-remote-chart
-# plan for CNPG.
+# database.mode already defaults to "cloudnativepg", and database.cloudnativepg.cluster.name
+# (pangolin-db) already matches cnpg-cluster.fullnameOverride's own default -- enabling the two
+# subcharts below is the only change this overlay needs. See LOCAL-PATCHES.md for why this superseded
+# the original multi-source-remote-chart plan for CNPG.
 #
 # MUST VERIFY before first sync: no cluster-wide CNPG operator already exists
 # (`kubectl get crd clusters.postgresql.cnpg.io`) -- cloudnative-pg installs cluster-scoped CRDs, a
-# ClusterRole, and a ValidatingWebhookConfiguration/MutatingWebhookConfiguration, so a second
-# install would collide with one already running elsewhere in the cluster. If one exists, set
+# ClusterRole, and a ValidatingWebhookConfiguration/MutatingWebhookConfiguration, so a second install
+# would collide with one already running elsewhere in the cluster. If one exists, set
 # cnpg-operator.enabled: false here and cnpg-cluster.enabled: true still creates just our Cluster CR
 # against the existing operator.
 # -----------------------------------------------------------------------------
-database:
-  mode: cloudnativepg
-
 cnpg-operator:
   enabled: true
 
 cnpg-cluster:
   enabled: true
   cluster:
-    # -- Do NOT prune the CNPG Cluster CR: pruning it cascades to delete its PVCs via CNPG's own
-    # owner references, which would silently and permanently lose every paired device's row. This
-    # Application runs prune:true/selfHeal:true like every other Application here; this annotation
-    # is the resource-scoped exception. See LOCAL-PATCHES.md "Security and operability".
+    # Do NOT prune the CNPG Cluster CR: pruning it cascades to delete its PVCs via CNPG's own owner
+    # references, which would silently and permanently lose every paired device's row. This
+    # Application runs prune:true/selfHeal:true like every other Application here; this annotation is
+    # the resource-scoped exception. See LOCAL-PATCHES.md "Security and operability".
     annotations:
       argocd.argoproj.io/sync-options: Prune=false
-    monitoring:
-      enabled: false # until Prometheus Operator CRDs are confirmed present in-cluster
 
 # -----------------------------------------------------------------------------
 # currentai patch block (LOCAL-PATCHES.md)
@@ -85,9 +82,6 @@ currentai:
       # vector. See LOCAL-PATCHES.md "Security and operability".
 
 pangolin:
-  replicaCount: 1 # MUST stay 1 -- SQLite/CNPG single-writer app, no shared session state (matches
-  # this repo's own agent-service convention of pinning single-instance workloads via values.schema.json)
-
   secret:
     # B2: the ExternalSecret above (currentai.serverSecretExternalSecret) creates this Secret name.
     # Setting existingSecretName skips the chart's own generated Secret entirely -- see
@@ -98,7 +92,6 @@ pangolin:
   config:
     app:
       dashboard_url: "https://pangolin.stg.aipotluck.org"
-      log_level: info
 
     domains:
       # Key name is PANGOLIN_DOMAIN_ID's value -- a config key, not a hostname. Keep it "domain1" to
@@ -107,79 +100,45 @@ pangolin:
         base_domain: "tunnel.stg.aipotluck.org"
         # Chart validation (_helpers.tpl, PANGOLIN-059) requires this non-empty, but Pangolin's OWN
         # server code -- not this Helm chart -- is what decides whether a per-device router's TLS
-        # block actually references it. Confirmed empirically against Pangolin 1.23.0 (the exact
-        # version pinned above, via `images.pangolin.tag`) during CUR-1266's local Compose bring-up:
-        # `getTraefikConfig.ts:1128` emits a bare `tls: {}` with no certResolver reference at all,
-        # regardless of this value. "none" is a deliberately inert placeholder, not a real resolver
-        # name -- there is no `--certificatesresolvers.none...` arg configured anywhere, so even if
-        # Pangolin's behavior changes in a later version, an unresolvable resolver name fails safe
-        # (Traefik logs and falls back to its default TLS store) rather than triggering a real ACME
-        # attempt against a resolver that IS configured (see the `letsencrypt` resolver note below).
+        # block actually references it. Confirmed empirically during CUR-1266's local Compose bring-up
+        # (Pangolin 1.23.0): `getTraefikConfig.ts:1128` emits a bare `tls: {}` with no certResolver
+        # reference at all, regardless of this value -- not yet re-confirmed at the 1.18.3 this
+        # overlay now runs; see the first-sync verification checklist in LOCAL-PATCHES.md. "none" is a
+        # deliberately inert placeholder, not a real resolver name -- there is no
+        # `--certificatesresolvers.none...` arg configured anywhere, so an unresolvable resolver name
+        # fails safe (Traefik logs and falls back to its default TLS store) rather than triggering a
+        # real ACME attempt against the resolver that IS configured (see letsencryptEmail below).
         cert_resolver: "none"
-        prefer_wildcard_cert: false
 
     gerbil:
       base_endpoint: "vpn.stg.aipotluck.org" # the WireGuard NLB hostname, NOT the dashboard.
-      # Two-pass: the NLB hostname doesn't exist until after the first sync creates the Service.
-      # DNS for vpn.stg is created in that gap -- see LOCAL-PATCHES.md "Rollout order".
+      # Two-pass: the NLB hostname doesn't exist until after the first sync creates the Service. DNS
+      # for vpn.stg is created in that gap -- see LOCAL-PATCHES.md "Rollout order".
 
     flags:
       enable_integration_api: true # REQUIRED -- defaults false; this is what makes PANGOLIN_API_URL work
-      disable_signup_without_invite: true
-      disable_user_create_org: false
-      allow_raw_resources: true
 
     traefik:
-      enabled: true
-      http_entrypoint: web
-      https_entrypoint: websecure
       # Same "required non-empty but never actually used for ACME" situation as domains.*.cert_resolver
-      # above -- this is the Traefik-wide default. Chart validation (PANGOLIN-014) separately forces
-      # traefik.config.letsencryptEmail to be non-empty too (below), which means a resolver actually
-      # named "letsencrypt" WILL exist in Traefik's own --certificatesresolvers.* args regardless of
-      # whether anything references it. Deliberately naming THIS field "none" (not "letsencrypt")
-      # means nothing in this config block points at the one resolver that does exist.
+      # above. Chart validation (PANGOLIN-014) separately forces traefik.config.letsencryptEmail to be
+      # non-empty too (below), which means a resolver actually named "letsencrypt" WILL exist in
+      # Traefik's own --certificatesresolvers.* args regardless of whether anything references it.
+      # Deliberately naming THIS field "none" (not "letsencrypt") means nothing in this config block
+      # points at the one resolver that does exist.
       cert_resolver: "none"
-      prefer_wildcard_cert: false
-
-  service:
-    type: ClusterIP
-
-controller:
-  enabled: false # standalone mode
-
-gerbil:
-  enabled: true
-  # startupMode is deliberately left at its "normal" default, NOT set to "delayed". The chart's own
-  # replicas=0-until-ready mechanism (README: "keep the multi-mode Gerbil Deployment at replicas=0")
-  # only exists in templates/deployment-gerbil.yaml, the multi-mode template -- confirmed by reading
-  # it directly (the `if eq $startupMode "delayed"` / `$replicas = 0` logic lives only there).
-  # templates/deployment-single.yaml, what deployment.mode=single actually renders, never references
-  # startupMode at all, so "delayed" would be a silent no-op under our topology: the whole
-  # pangolin+gerbil+traefik pod starts at pangolin.replicaCount regardless. Accept a real
-  # CrashLoopBackOff on the gerbil CONTAINER (not the whole pod -- pangolin and traefik keep running)
-  # between first sync and the bootstrap runbook creating the org/exit-node; Kubernetes' own restart
-  # backoff self-heals it once gerbil's `--remoteConfig` call starts succeeding. See LOCAL-PATCHES.md
-  # "Rollout order" -- there is no flip-a-flag mitigation for this combination, and none is needed.
-  persistence:
-    enabled: true # gerbil's WireGuard private key. Losing this PVC silently and permanently breaks
-    size: 1Gi # every paired device -- back this up to Secrets Manager once cluster access exists.
 
 traefik:
-  enabled: true
+  enabled: true # chart default is false at the top level (distinct from pangolin.config.traefik above)
   service:
     # MUST be ClusterIP, and is NOT the chart's default (upstream defaults this to LoadBalancer).
     # Traefik sits behind the shared currentai-public ALB via the centralized charts/ingress entry
     # (pangolin-tunnel-ingress), which is what keeps this repo's "all applications share a single
     # common Load Balancer" rule intact. Leaving the default would silently provision a second,
-    # redundant cloud load balancer for Traefik that nothing routes to -- billed, internet-facing,
-    # and invisible unless someone reads the rendered Service.
+    # redundant cloud load balancer for Traefik that nothing routes to -- billed, internet-facing, and
+    # invisible unless someone reads the rendered Service. Caught only by rendering the chart and
+    # reading back every Service's type, not by reasoning about the values file.
     type: ClusterIP
   config:
-    dashboard: false # upstream default; our LOCAL dev config flips this to true, which must NOT
-    # carry over here -- true exposes Traefik's entire live config, including every device's route.
-    insecureSkipVerify: false # upstream default; ditto -- local dev's opposite value doesn't belong here
-    logLevel: INFO
     dynamicRouters:
       host: "pangolin.stg.aipotluck.org" # required non-empty by chart validation (PANGOLIN-043); this
       # chart doesn't render an Ingress/IngressRoute for it in standalone mode (see LOCAL-PATCHES.md),
@@ -188,21 +147,21 @@ traefik:
     # (PANGOLIN-014) whenever traefik.enabled=true, even though we run zero real ACME issuance -- see
     # the cert_resolver note above. Change to whatever address should actually receive any stray
     # Let's Encrypt mail Traefik's client library might still send.
-  persistence:
-    enabled: false # no ACME storage needed -- see above
 
+# networkPolicy.enabled is already true by default. The one real gap: externalIngress.integration
+# defaults to false, which would silently block the Integration API port even with
+# pangolin.config.flags.enable_integration_api: true set above (networkpolicy.yaml ANDs both).
 networkPolicy:
-  enabled: true
-  # networkPolicy.pangolin.externalIngress.integration defaults to false upstream, which would
-  # silently break the one path Vercel actually calls (PANGOLIN_API_URL). Confirm this key's exact
-  # location with `helm template` before the first real sync -- flagged here so it isn't missed.
+  pangolin:
+    externalIngress:
+      integration: true
 
-monitoring:
-  enabled: false # until `kubectl get crd servicemonitors.monitoring.coreos.com` confirms the
-  # Prometheus Operator is actually installed -- an unknown CRD kind hard-fails the whole sync.
+# monitoring.enabled is already false by default -- leave it there until `kubectl get crd
+# servicemonitors.monitoring.coreos.com` confirms the Prometheus Operator is actually installed; an
+# unknown CRD kind hard-fails the whole sync.
 
 # Resource requests+limits are a universal convention in this repo (see charts/agent-service). The
 # chart's own per-component `resources:` keys (pangolin.resources, gerbil.resources, traefik.resources,
-# cnpg-cluster's own resources) are left at chart defaults here deliberately -- confirm those
-# defaults are sane via `helm template` and size them for real before the first production-facing
-# sync, rather than guessing numbers with no load data to validate against.
+# cnpg-cluster's own resources) are left at chart defaults here deliberately -- confirm those defaults
+# are sane via `helm template` and size them for real before the first production-facing sync, rather
+# than guessing numbers with no load data to validate against.
