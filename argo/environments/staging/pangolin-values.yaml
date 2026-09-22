@@ -167,6 +167,14 @@ gerbil:
 
 traefik:
   enabled: true
+  service:
+    # MUST be ClusterIP, and is NOT the chart's default (upstream defaults this to LoadBalancer).
+    # Traefik sits behind the shared currentai-public ALB via the centralized charts/ingress entry
+    # (pangolin-tunnel-ingress), which is what keeps this repo's "all applications share a single
+    # common Load Balancer" rule intact. Leaving the default would silently provision a second,
+    # redundant cloud load balancer for Traefik that nothing routes to -- billed, internet-facing,
+    # and invisible unless someone reads the rendered Service.
+    type: ClusterIP
   config:
     dashboard: false # upstream default; our LOCAL dev config flips this to true, which must NOT
     # carry over here -- true exposes Traefik's entire live config, including every device's route.
