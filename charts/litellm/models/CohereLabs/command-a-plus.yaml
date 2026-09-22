@@ -1,5 +1,5 @@
 models:
-- model_name: command-a-plus
+- model_name: CohereLabs/command-a-plus
   litellm_params:
     model: huggingface/CohereLabs/command-a-plus-05-2026-w4a4:cohere
     api_base: https://router.huggingface.co/v1

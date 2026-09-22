@@ -96,6 +96,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: hf_token
                   optional: true
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: openrouter_api_key
+                  optional: true
             - name: SLACK_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:

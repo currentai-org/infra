@@ -5,16 +5,16 @@ models:
       drop_params: true
       complexity_router_config:
         classifier_type: heuristic
-        complexity_router_default_model: Qwen/Qwen3.8-27B
+        complexity_router_default_model: mistralai/ministral-8b-2512
         tiers:
           SIMPLE:
-            - Qwen/Qwen3.5-35B-A3B
+            - mistralai/ministral-3b-2512
           MEDIUM:
-            - Qwen/Qwen3.8-27B
+            - mistralai/ministral-8b-2512
           COMPLEX:
-            - Qwen/Qwen3.5-122B-A10B
+            - mistralai/mistral-small-2603
           REASONING:
-            - Qwen/Qwen3-235B-A22B-Thinking-2507
+            - mistralai/mistral-medium-3.1
     model_info:
       access_groups: ["public", "private"]
   - model_name: mini-qwen

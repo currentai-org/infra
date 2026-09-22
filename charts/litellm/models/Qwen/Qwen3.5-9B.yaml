@@ -1,5 +1,5 @@
 models:
-- model_name: Qwen3.5-9B
+- model_name: Qwen/Qwen3.5-9B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-9B:together
     api_base: https://router.huggingface.co/v1
@@ -8,7 +8,7 @@ models:
       X-HF-Bill-To: "current-ai-official"
   model_info:
     access_groups: ["public", "private"]
-- model_name: Qwen3.5-9B
+- model_name: Qwen/Qwen3.5-9B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-9B:ovhcloud
     api_base: https://router.huggingface.co/v1
@@ -17,7 +17,7 @@ models:
       X-HF-Bill-To: "current-ai-official"
   model_info:
     access_groups: ["public", "private"]
-- model_name: Qwen3.5-9B
+- model_name: Qwen/Qwen3.5-9B
   litellm_params:
     model: huggingface/Qwen/Qwen3.5-9B:deepinfra
     api_base: https://router.huggingface.co/v1

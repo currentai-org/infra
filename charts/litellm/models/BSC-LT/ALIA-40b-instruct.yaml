@@ -1,5 +1,5 @@
 models:
-- model_name: ALIA-40b-instruct
+- model_name: BSC-LT/ALIA-40b-instruct
   litellm_params:
     model: openai/alia-salamandra:40b
     api_base: https://api.nextbit256.com/v1

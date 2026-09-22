@@ -3,12 +3,12 @@ models:
   litellm_params:
     model: auto_router/complexity_router
     drop_params: true
-    complexity_router_default_model: tiny-aya-global
+    complexity_router_default_model: CohereLabs/tiny-aya-global
     complexity_router_config:
       classifier_type: llm
       classifier_fallback: default_model
       classifier_llm_config:
-        model: tiny-aya-global
+        model: CohereLabs/tiny-aya-global
         timeout_ms: 3000
         system_prompt: |
           You are a language detection classifier. Analyze the input prompt and determine the language family or geographic region:
@@ -18,9 +18,9 @@ models:
           - Reply "REASONING" for any other language, mixed languages, or if you cannot determine the language.
           Return ONLY JSON with the format: {"tier": "<TIER>"}
       tiers:
-        SIMPLE: tiny-aya-water
-        MEDIUM: tiny-aya-earth
-        COMPLEX: tiny-aya-fire
-        REASONING: tiny-aya-global
+        SIMPLE: CohereLabs/tiny-aya-water
+        MEDIUM: CohereLabs/tiny-aya-earth
+        COMPLEX: CohereLabs/tiny-aya-fire
+        REASONING: CohereLabs/tiny-aya-global
   model_info:
     access_groups: ["public", "private"]

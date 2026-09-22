@@ -1,5 +1,5 @@
 models:
-- model_name: tiny-aya-fire
+- model_name: CohereLabs/tiny-aya-fire
   litellm_params:
     model: huggingface/CohereLabs/tiny-aya-fire:cohere
     api_base: https://router.huggingface.co/v1

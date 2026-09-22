@@ -1,5 +1,5 @@
 models:
-- model_name: tiny-aya-global
+- model_name: CohereLabs/tiny-aya-global
   litellm_params:
     model: huggingface/CohereLabs/tiny-aya-global:cohere
     api_base: https://router.huggingface.co/v1
