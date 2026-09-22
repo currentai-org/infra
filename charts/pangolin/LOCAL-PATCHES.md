@@ -9,6 +9,13 @@ Written for CUR-1266's "managed" local-inference endpoint kind (a user's llama.c
 through a Pangolin tunnel). The companion plan document has the full staging rollout design,
 hostnames, and rollout order; this file is scoped to *what differs from upstream and why*.
 
+**If you don't already know what Pangolin does or why this chart is shaped the way it is, read
+`pangolin/ARCHITECTURE.md` in the `aipotluck.org` repo first.** It has the system map and two
+sequence diagrams (pairing a device, serving one inference request), and explains the two constraints
+that drive most of the decisions below: the three containers must share a network namespace (which is
+why `deployment.mode: single`), and there are three distinct network paths whose hostnames are easy to
+confuse. This file assumes that context.
+
 ## Why vendor instead of referencing the chart remotely
 
 The repo's own convention (see `../../README.md`) is to hand-write charts, and the original design
