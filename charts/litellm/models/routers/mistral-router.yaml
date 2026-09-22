@@ -1,5 +1,5 @@
 models:
-  - model_name: smart-qwen
+  - model_name: smart-mistral
     litellm_params:
       model: auto_router/complexity_router
       drop_params: true
@@ -15,23 +15,5 @@ models:
             - mistralai/mistral-small-2603
           REASONING:
             - mistralai/mistral-medium-3.1
-    model_info:
-      access_groups: ["public", "private"]
-  - model_name: mini-qwen
-    litellm_params:
-      model: auto_router/complexity_router
-      drop_params: true
-      complexity_router_config:
-        classifier_type: heuristic
-        complexity_router_default_model: Qwen/Qwen3.5-9B
-        tiers:
-          SIMPLE:
-            - Qwen/Qwen3.5-4B
-          MEDIUM:
-            - Qwen/Qwen3.5-9B
-          COMPLEX:
-            - Qwen/Qwen3.5-35B-A3B
-          REASONING:
-            - Qwen/Qwen3.8-27B
     model_info:
       access_groups: ["public", "private"]
