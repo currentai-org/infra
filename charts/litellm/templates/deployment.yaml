@@ -119,6 +119,26 @@ spec:
 
           ports:
             - containerPort: {{ .Values.app.port }}
+          {{- if .Values.app.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.app.livenessProbe.path | default "/health/liveliness" }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.app.livenessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.app.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.app.livenessProbe.failureThreshold | default 3 }}
+          {{- end }}
+          {{- if .Values.app.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.app.readinessProbe.path | default "/health/readiness" }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.readinessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.app.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.app.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.app.readinessProbe.failureThreshold | default 3 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
       volumes:

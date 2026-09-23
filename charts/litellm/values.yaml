@@ -11,6 +11,20 @@ app:
   replicas: 1
   minReadySeconds: 35
   port: 4000
+  livenessProbe:
+    enabled: true
+    path: /health/liveliness
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    path: /health/readiness
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
   resources:
     requests:
       memory: 3Gi
