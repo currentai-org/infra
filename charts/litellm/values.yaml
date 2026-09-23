@@ -8,7 +8,7 @@ app:
     repository: docker.litellm.ai/berriai/litellm
     tag: v1.99.0
     pullPolicy: IfNotPresent
-  replicas: 1
+  replicas: 2
   minReadySeconds: 35
   port: 4000
   livenessProbe:
@@ -32,6 +32,36 @@ app:
     limits:
       memory: 4Gi
       cpu: 1000m
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - litellm
+            topologyKey: kubernetes.io/hostname
+        - weight: 50
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - litellm
+            topologyKey: topology.kubernetes.io/zone
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: litellm
+  nodeSelector: {}
+  tolerations: []
 service:
   name: litellm-service
   type: ClusterIP
@@ -69,8 +99,8 @@ router:
   routingStrategy: latency-based-routing
 autoscaling:
   enabled: true
-  minReplicas: 1
-  maxReplicas: 3
+  minReplicas: 2
+  maxReplicas: 4
   targetCPUUtilizationPercentage: 75
   targetMemoryUtilizationPercentage: 85
   behavior:
