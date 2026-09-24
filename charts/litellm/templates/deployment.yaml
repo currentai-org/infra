@@ -125,6 +125,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: slack_webhook_url
                   optional: true
+            - name: INFOMANIAK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: infomaniak_api_key
+                  optional: true
 
 
 
