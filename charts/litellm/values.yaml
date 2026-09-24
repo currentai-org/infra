@@ -10,7 +10,18 @@ app:
     pullPolicy: IfNotPresent
   replicas: 2
   minReadySeconds: 35
+  terminationGracePeriodSeconds: 30
   port: 4000
+  preStop:
+    enabled: true
+    sleepSeconds: 5
+  startupProbe:
+    enabled: true
+    path: /health/liveliness
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
   livenessProbe:
     enabled: true
     path: /health/liveliness
@@ -97,6 +108,7 @@ env:
   litellmRedisNamespace: litellm
 router:
   routingStrategy: latency-based-routing
+  redisUrl: "os.environ/REDIS_URL"
 autoscaling:
   enabled: true
   minReplicas: 2
@@ -119,3 +131,7 @@ autoscaling:
 
 prometheus:
   enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
