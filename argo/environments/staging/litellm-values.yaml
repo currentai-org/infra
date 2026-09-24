@@ -17,3 +17,6 @@ env:
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::818561370924:role/AmazonEKS_LiteLLM_Role
+
+prometheus:
+  enabled: true
