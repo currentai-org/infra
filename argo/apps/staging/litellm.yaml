@@ -1,10 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: currentai-ingress
+  name: currentai-router
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
     notifications.argoproj.io/subscribe.on-health-degraded.slack: "#argo-alerts"
     notifications.argoproj.io/subscribe.on-sync-failed.slack: "#argo-alerts"
     notifications.argoproj.io/subscribe.on-health-degraded.email: "sean@publicai.co"
@@ -20,17 +19,23 @@ spec:
   source:
     repoURL: 'https://github.com/currentai-org/infra'
     targetRevision: dev
-    path: charts/ingress
+    path: charts/litellm
     helm:
       valueFiles:
         - values.yaml
-        - ../../argo/environments/staging/ingress-values.yaml
+        - ../../argo/environments/staging/litellm-values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: experiment
+    namespace: currentai-router
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

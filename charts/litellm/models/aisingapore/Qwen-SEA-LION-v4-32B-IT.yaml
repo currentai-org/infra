@@ -1,0 +1,9 @@
+models:
+- model_name: aisingapore/Qwen-SEA-LION-v4-32B-IT
+  litellm_params:
+    model: openai/aisingapore/Qwen-SEA-LION-v4-32B-IT
+    api_base: https://api.sea-lion.ai
+    api_key: os.environ/SEALION_API_KEY
+    supports_vision: true
+  model_info:
+    access_groups: ["public", "private"]

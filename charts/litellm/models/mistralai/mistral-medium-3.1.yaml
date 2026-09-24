@@ -1,0 +1,8 @@
+models:
+- model_name: mistralai/mistral-medium-3.1
+  litellm_params:
+    model: openai/mistralai/mistral-medium-3.1
+    api_base: https://openrouter.ai/api/v1
+    api_key: os.environ/OPENROUTER_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
