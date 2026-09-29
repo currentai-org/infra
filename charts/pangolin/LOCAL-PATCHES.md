@@ -276,6 +276,20 @@ them into `postgresql://<user>:<password>@<host>:5432/<database>?sslmode=require
 to how `charts/litellm/templates/secrets.yaml` connects to the shared RDS instance. It is gated under
 `currentai.databaseExternalSecret.enabled`.
 
+## B5 — Gerbil SNI proxy port collision with Traefik in `deployment.mode: single`
+
+**Files patched:** `templates/deployment-single.yaml`, `templates/deployment-gerbil.yaml`, `values.yaml`.
+
+In `deployment.mode: single`, pangolin, traefik, and gerbil share the same pod network namespace. Traefik binds `:8443` for its HTTPS entrypoint (`--entrypoints.websecure.address=:8443`). Gerbil's default `--sni-port` is also `8443`, causing Gerbil to immediately fail on startup with:
+`FATAL: Failed to start proxy: failed to listen on port 8443: listen tcp :8443: bind: address already in use`.
+
+The upstream chart's deployment templates did not pass `--sni-port` in gerbil's default CLI arguments, nor did `values.yaml` define `gerbil.ports.sniPort`. We added:
+- `gerbil.ports.sniPort: 8444` in `values.yaml`.
+- `--sni-port={{ $gerbil.ports.sniPort | default 8444 }}` to the default args block in both `deployment-single.yaml` and `deployment-gerbil.yaml`.
+
+This moves Gerbil's SNI proxy listener to 8444, eliminating the port collision with Traefik.
+
+
 ## CloudNativePG comes bundled, not as a separate Application
 
 An earlier draft of the staging rollout plan (written before this chart was actually fetched and

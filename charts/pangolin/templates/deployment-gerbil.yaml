@@ -133,6 +133,7 @@ spec:
             - {{ printf "--reachableAt=http://%s-gerbil:%v" (include "pangolin.fullname" $root) ($gerbil.ports.internalApi | default 3004) | quote }}
             - --generateAndSaveKeyTo=/var/config/key
             - {{ printf "--remoteConfig=http://%s:%v/api/v1/" (include "pangolin.fullname" $root) ($root.Values.pangolin.service.ports.internalApi | default 3001) | quote }}
+            - {{ printf "--sni-port=%v" ($gerbil.ports.sniPort | default 8444) | quote }}
           {{- end }}
           ports:
             - name: wg1
@@ -143,6 +144,9 @@ spec:
               protocol: UDP
             - name: internal-api
               containerPort: {{ $gerbil.ports.internalApi | default 3004 }}
+              protocol: TCP
+            - name: sni-port
+              containerPort: {{ $gerbil.ports.sniPort | default 8444 }}
               protocol: TCP
           {{- $gerbilEnv := include "pangolin.gerbilEnv" $root | trim }}
           {{- if $gerbilEnv }}

@@ -1307,6 +1307,8 @@ gerbil:
     wg2: 21820 # @schema type: integer ; minimum: 1 ; maximum: 65535
     # -- Internal Gerbil API/listener TCP port.
     internalApi: 3004 # @schema type: integer ; minimum: 1 ; maximum: 65535
+    # -- Internal Gerbil SNI proxy TCP port. Defaults to 8444 (rather than Gerbil's internal 8443 default) to prevent port collision with Traefik websecure in single-pod mode.
+    sniPort: 8444 # @schema type: integer ; minimum: 1 ; maximum: 65535
 
   service:
     # -- Create a Service for Gerbil UDP traffic.
