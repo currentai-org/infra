@@ -1,0 +1,38 @@
+# currentai addition (LOCAL-PATCHES.md). ALB (Ingress) is L7-only and cannot carry WireGuard's UDP
+# traffic, so Gerbil needs a real LoadBalancer Service -- but the chart's own gerbil Service
+# (service-gerbil.yaml) carries wg1/wg2 (UDP, meant to be public) alongside internalApi (TCP 3004,
+# Gerbil's unauthenticated control channel, meant to stay cluster-internal only). Flipping that
+# Service's own .Values.gerbil.service.type to LoadBalancer would publish internalApi to the internet
+# too. This is a second, UDP-only Service instead, so the chart's own Service can stay ClusterIP.
+{{- if and (eq (include "pangolin.gerbil.resourcesEnabled" .) "true") .Values.currentai.gerbilWireguardNlb.enabled }}
+{{- $root := . -}}
+{{- $gerbil := .Values.gerbil -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-gerbil-wg-nlb" (include "pangolin.fullname" .) }}
+  namespace: {{ include "pangolin.namespace" . }}
+  labels:
+    {{- include "pangolin.labels" $root | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "gerbil") | nindent 4 }}
+    app.kubernetes.io/component: gerbil-wg-nlb
+  annotations:
+    {{- toYaml .Values.currentai.gerbilWireguardNlb.annotations | nindent 4 }}
+spec:
+  type: LoadBalancer
+  selector:
+    {{- if eq .Values.deployment.mode "single" }}
+    {{- include "pangolin.single.selectorLabels" $root | nindent 4 }}
+    {{- else }}
+    {{- include "pangolin.gerbil.selectorLabels" $root | nindent 4 }}
+    {{- end }}
+  ports:
+    - name: wg1
+      port: {{ $gerbil.ports.wg1 }}
+      targetPort: wg1
+      protocol: UDP
+    - name: wg2
+      port: {{ $gerbil.ports.wg2 }}
+      targetPort: wg2
+      protocol: UDP
+{{- end }}

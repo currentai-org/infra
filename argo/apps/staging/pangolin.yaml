@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: currentai-pangolin
+  namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: "#argo-alerts"
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: "#argo-alerts"
+    notifications.argoproj.io/subscribe.on-health-degraded.email: "sean@publicai.co"
+    notifications.argoproj.io/subscribe.on-sync-failed.email: "sean@publicai.co"
+    notifications.argoproj.io/subscribe.on-deployed.slack: "#argo-alerts"
+    notifications.argoproj.io/subscribe.on-deployed.email: "sean@publicai.co"
+    notifications.argoproj.io/subscribe.on-created.slack: "#argo-alerts"
+    notifications.argoproj.io/subscribe.on-created.email: "sean@publicai.co"
+    notifications.argoproj.io/subscribe.on-deleted.slack: "#argo-alerts"
+    notifications.argoproj.io/subscribe.on-deleted.email: "sean@publicai.co"
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/currentai-org/infra'
+    targetRevision: dev
+    path: charts/pangolin
+    helm:
+      valueFiles:
+        - values.yaml
+        - ../../argo/environments/staging/pangolin-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pangolin
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # The bundled CloudNativePG operator ships CRDs whose rendered size (the largest,
+      # clusters.postgresql.cnpg.io, is ~250KB) exceeds kubectl's client-side
+      # last-applied-configuration annotation limit (~256KB) once ArgoCD's own tracking metadata is
+      # added. Without this, the CRD apply fails with "metadata.annotations: Too long: must have at
+      # most 262144 bytes" on every sync.
+      - ServerSideApply=true
+    managedNamespaceMetadata:
+      labels:
+        # Gerbil needs NET_ADMIN for WireGuard; deployment.mode=single puts it in the same Pod as
+        # Pangolin and Traefik, so this level applies to the whole namespace, not just Gerbil. See
+        # charts/pangolin/LOCAL-PATCHES.md's Risks section.
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/warn: restricted
+        pod-security.kubernetes.io/audit: restricted
