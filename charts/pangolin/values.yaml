@@ -1453,7 +1453,8 @@ currentai:
     dbPasswordProperty: password
     databaseName: pangolin
     port: 5432
-    sslMode: require
+    sslMode: no-verify
+    extraParams: ""
     target:
       creationPolicy: Owner
       deletionPolicy: Retain

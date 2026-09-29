@@ -64,6 +64,7 @@ currentai:
     managedSecretsName: staging/aichat/open-webui/managed-secrets
     dbPasswordArn: staging/aichat/database/password
     databaseName: pangolin
+    sslMode: no-verify
   gerbilWireguardNlb:
     enabled: true
     annotations:
