@@ -34,12 +34,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      # The bundled CloudNativePG operator ships CRDs whose rendered size (the largest,
-      # clusters.postgresql.cnpg.io, is ~250KB) exceeds kubectl's client-side
-      # last-applied-configuration annotation limit (~256KB) once ArgoCD's own tracking metadata is
-      # added. Without this, the CRD apply fails with "metadata.annotations: Too long: must have at
-      # most 262144 bytes" on every sync.
-      - ServerSideApply=true
     managedNamespaceMetadata:
       labels:
         # Gerbil needs NET_ADMIN for WireGuard; deployment.mode=single puts it in the same Pod as
