@@ -262,6 +262,19 @@ Gerbil holds every paired device's WireGuard state; its version should never sil
 unrelated chart bump the way an omitted default would. `"latest"` (what the overlay carried before this
 pass, to match local dev's `fosrl/gerbil:latest`) was dropped for the same reason applied more broadly:
 it isn't a version, it's an unpinned floor that means a different image on every re-pull.
+## B4 — External PostgreSQL connection string via ExternalSecret
+
+**File added:** `templates/externalsecret-database.currentai.yaml`.
+
+When running Pangolin with an external AWS RDS database (`database.mode: external`), Pangolin expects a single
+secret with key `connectionString` (or `POSTGRES_CONNECTION_STRING` env var). Sourcing RDS connection credentials
+directly from AWS Secrets Manager using the existing shared staging credentials (`managedSecretsName: staging/aichat/open-webui/managed-secrets`,
+`dbPasswordArn: staging/aichat/database/password`) requires extracting `DB_HOST`, `DB_USER`, and `DB_PASSWORD` and assembling
+them into `postgresql://<user>:<password>@<host>:5432/<database>?sslmode=require`.
+
+`templates/externalsecret-database.currentai.yaml` provides this via the `aws-secretsmanager` ClusterSecretStore, identical
+to how `charts/litellm/templates/secrets.yaml` connects to the shared RDS instance. It is gated under
+`currentai.databaseExternalSecret.enabled`.
 
 ## CloudNativePG comes bundled, not as a separate Application
 

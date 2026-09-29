@@ -1438,6 +1438,25 @@ currentai:
   gerbilWireguardNlb:
     enabled: false
     annotations: {}
+  # -- ExternalSecret for external PostgreSQL (templates/externalsecret-database.currentai.yaml).
+  # Used when database.mode=external to construct the connection string secret directly from AWS Secrets Manager.
+  databaseExternalSecret:
+    enabled: false
+    refreshInterval: 1h
+    secretStoreRef:
+      name: aws-secretsmanager
+      kind: ClusterSecretStore
+    managedSecretsName: ""
+    dbPasswordArn: ""
+    dbHostProperty: DB_HOST
+    dbUserProperty: DB_USER
+    dbPasswordProperty: password
+    databaseName: pangolin
+    port: 5432
+    sslMode: require
+    target:
+      creationPolicy: Owner
+      deletionPolicy: Retain
 
 # -----------------------------------------------------------------------------
 # Database

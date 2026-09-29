@@ -36,32 +36,21 @@ images:
 # 1.18.3, that's a real finding for the first sync to surface, not something to pre-empt here.
 
 # -----------------------------------------------------------------------------
-# Database: CloudNativePG, bundled as this chart's own subchart dependency (charts/cloudnative-pg
-# aliased cnpg-operator, charts/cluster aliased cnpg-cluster) -- NOT a separate ArgoCD Application.
-# database.mode already defaults to "cloudnativepg", and database.cloudnativepg.cluster.name
-# (pangolin-db) already matches cnpg-cluster.fullnameOverride's own default -- enabling the two
-# subcharts below is the only change this overlay needs. See LOCAL-PATCHES.md for why this superseded
-# the original multi-source-remote-chart plan for CNPG.
-#
-# MUST VERIFY before first sync: no cluster-wide CNPG operator already exists
-# (`kubectl get crd clusters.postgresql.cnpg.io`) -- cloudnative-pg installs cluster-scoped CRDs, a
-# ClusterRole, and a ValidatingWebhookConfiguration/MutatingWebhookConfiguration, so a second install
-# would collide with one already running elsewhere in the cluster. If one exists, set
-# cnpg-operator.enabled: false here and cnpg-cluster.enabled: true still creates just our Cluster CR
-# against the existing operator.
+# Database: External AWS RDS PostgreSQL (same shared RDS instance as LiteLLM).
+# Connects to RDS via an ExternalSecret extracting host/password from AWS Secrets Manager.
+# CNPG subcharts are disabled.
 # -----------------------------------------------------------------------------
 cnpg-operator:
-  enabled: true
+  enabled: false
 
 cnpg-cluster:
-  enabled: true
-  cluster:
-    # Do NOT prune the CNPG Cluster CR: pruning it cascades to delete its PVCs via CNPG's own owner
-    # references, which would silently and permanently lose every paired device's row. This
-    # Application runs prune:true/selfHeal:true like every other Application here; this annotation is
-    # the resource-scoped exception. See LOCAL-PATCHES.md "Security and operability".
-    annotations:
-      argocd.argoproj.io/sync-options: Prune=false
+  enabled: false
+
+database:
+  mode: external
+  connection:
+    existingSecretName: pangolin-db-connection
+    existingSecretKey: connectionString
 
 # -----------------------------------------------------------------------------
 # currentai patch block (LOCAL-PATCHES.md)
@@ -70,6 +59,11 @@ currentai:
   serverSecretExternalSecret:
     enabled: true
     remoteKey: /pangolin
+  databaseExternalSecret:
+    enabled: true
+    managedSecretsName: staging/aichat/open-webui/managed-secrets
+    dbPasswordArn: staging/aichat/database/password
+    databaseName: pangolin
   gerbilWireguardNlb:
     enabled: true
     annotations:
@@ -126,6 +120,14 @@ pangolin:
       # Deliberately naming THIS field "none" (not "letsencrypt") means nothing in this config block
       # points at the one resolver that does exist.
       cert_resolver: "none"
+
+gerbil:
+  persistence:
+    annotations:
+      # Protect Gerbil's WireGuard private key PVC from being deleted during ArgoCD automated prune
+      argocd.argoproj.io/sync-options: Prune=false
+      # Prevent Helm from deleting the PVC during release upgrade or chart uninstall
+      helm.sh/resource-policy: keep
 
 traefik:
   enabled: true # chart default is false at the top level (distinct from pangolin.config.traefik above)
