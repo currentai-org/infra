@@ -98,6 +98,23 @@ ingresses:
       port: 3003
 
   - enabled: true
+    name: pangolin-tunnel-apex-ingress # apex tunnel domain
+    namespace: currentai-pangolin
+    ingressClassName: alb
+    host: "tunnel.{{ .Values.domain }}"
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/788b4142-6add-444c-8303-7aae6aa0cca9"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    targetService:
+      name: pangolin-traefik
+      port: 443
+
+  - enabled: true
     name: pangolin-tunnel-ingress # per-device resources
     namespace: currentai-pangolin
     ingressClassName: alb
@@ -119,4 +136,5 @@ ingresses:
     targetService:
       name: pangolin-traefik
       port: 443
+
 
