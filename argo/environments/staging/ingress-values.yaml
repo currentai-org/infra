@@ -52,7 +52,7 @@ ingresses:
   # agent-service/router's certs too.
   - enabled: true
     name: pangolin-dashboard-ingress
-    namespace: pangolin
+    namespace: currentai-pangolin
     ingressClassName: alb
     host: pangolin.{{ .Values.domain }}
     annotations:
@@ -83,7 +83,7 @@ ingresses:
 
   - enabled: true
     name: pangolin-api-ingress # Integration API -- this is PANGOLIN_API_URL, what Vercel calls
-    namespace: pangolin
+    namespace: currentai-pangolin
     ingressClassName: alb
     host: pangolin-api.{{ .Values.domain }}
     annotations:
@@ -99,7 +99,7 @@ ingresses:
 
   - enabled: true
     name: pangolin-tunnel-ingress # per-device resources
-    namespace: pangolin
+    namespace: currentai-pangolin
     ingressClassName: alb
     host: "*.tunnel.{{ .Values.domain }}"
     annotations:

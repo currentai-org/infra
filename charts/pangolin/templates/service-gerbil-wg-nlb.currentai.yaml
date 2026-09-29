@@ -4,7 +4,7 @@
 # Gerbil's unauthenticated control channel, meant to stay cluster-internal only). Flipping that
 # Service's own .Values.gerbil.service.type to LoadBalancer would publish internalApi to the internet
 # too. This is a second, UDP-only Service instead, so the chart's own Service can stay ClusterIP.
-{{- if and (eq (include "pangolin.gerbil.resourcesEnabled" .) "true") .Values.currentai.gerbilWireguardNlb.enabled }}
+{{ if and (eq (include "pangolin.gerbil.resourcesEnabled" .) "true") .Values.currentai.gerbilWireguardNlb.enabled }}
 {{- $root := . -}}
 {{- $gerbil := .Values.gerbil -}}
 apiVersion: v1

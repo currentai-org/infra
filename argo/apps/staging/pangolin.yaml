@@ -21,12 +21,13 @@ spec:
     targetRevision: dev
     path: charts/pangolin
     helm:
+      releaseName: pangolin
       valueFiles:
         - values.yaml
         - ../../argo/environments/staging/pangolin-values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: pangolin
+    namespace: currentai-pangolin
   syncPolicy:
     automated:
       prune: true
