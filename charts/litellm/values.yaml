@@ -84,6 +84,8 @@ serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::901779868336:role/AmazonEKS_LiteLLM_Role
 config:
+  general_settings:
+    store_prompts_in_spend_logs: true
   litellm_settings:
     num_retries: 5
     allowed_fails: 1

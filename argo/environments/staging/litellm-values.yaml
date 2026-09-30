@@ -20,3 +20,7 @@ serviceAccount:
 
 prometheus:
   enabled: true
+
+config:
+  general_settings:
+    store_prompts_in_spend_logs: false

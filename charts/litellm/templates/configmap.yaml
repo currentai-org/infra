@@ -12,7 +12,11 @@ data:
       allow_requests_on_db_unavailable: true
       master_key: "os.environ/LITELLM_MASTER_KEY"
       enforce_user_param: false
+      {{- if and .Values.config (hasKey .Values.config "general_settings") (hasKey .Values.config.general_settings "store_prompts_in_spend_logs") }}
+      store_prompts_in_spend_logs: {{ .Values.config.general_settings.store_prompts_in_spend_logs }}
+      {{- else }}
       store_prompts_in_spend_logs: true
+      {{- end }}
       alerting: ["slack"]
       alert_types: [
         "llm_too_slow",
