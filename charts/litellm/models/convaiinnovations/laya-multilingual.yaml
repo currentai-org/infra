@@ -1,8 +1,0 @@
-models:
-- model_name: convaiinnovations/laya-multilingual
-  litellm_params:
-    model: openai/convaiinnovations/laya-multilingual
-    api_base: https://api.impossibl.com/v1
-    api_key: os.environ/IMPOSSIBL_API_KEY
-  model_info:
-    access_groups: ["public", "private"]
