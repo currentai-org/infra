@@ -131,6 +131,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: infomaniak_api_key
                   optional: true
+            - name: IMPOSSIBL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: impossibl_api_key
+                  optional: true
 
 
 
