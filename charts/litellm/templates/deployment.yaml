@@ -10,7 +10,7 @@ spec:
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
-  progressDeadlineSeconds: 300
+  progressDeadlineSeconds: {{ .Values.app.progressDeadlineSeconds | default 600 }}
   minReadySeconds: {{ .Values.app.minReadySeconds | default 30 }}
   selector:
     matchLabels:

@@ -18,10 +18,10 @@ app:
   startupProbe:
     enabled: true
     path: /health/liveliness
-    initialDelaySeconds: 10
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 5
-    failureThreshold: 30
+    failureThreshold: 60
   livenessProbe:
     enabled: true
     path: /health/liveliness
