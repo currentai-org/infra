@@ -46,6 +46,48 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: litellm-migration
+          image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          args:
+            - "--config"
+            - "/app/config.yaml"
+            - "--skip_server_startup"
+          env:
+            - name: AWS_REGION
+              value: {{ .Values.env.aws_region | quote }}
+            - name: LITELLM_MODE
+              value: "PRODUCTION"
+            - name: USE_PRISMA_MIGRATE
+              value: "True"
+            - name: LITELLM_SALT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: litellm_salt_key
+            - name: LITELLM_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: litellm_master_key
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: database_url
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
       containers:
         - name: {{ .Values.app.name }}
           image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}
@@ -64,7 +106,7 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: litellm_salt_key
             - name: USE_PRISMA_MIGRATE
-              value: "True"
+              value: "False"
             - name: LITELLM_MASTER_KEY
               valueFrom:
                 secretKeyRef:
@@ -159,10 +201,10 @@ spec:
             httpGet:
               path: {{ .Values.app.startupProbe.path | default "/health/liveliness" }}
               port: {{ .Values.app.port }}
-            initialDelaySeconds: {{ .Values.app.startupProbe.initialDelaySeconds | default 10 }}
+            initialDelaySeconds: {{ .Values.app.startupProbe.initialDelaySeconds | default 15 }}
             periodSeconds: {{ .Values.app.startupProbe.periodSeconds | default 5 }}
             timeoutSeconds: {{ .Values.app.startupProbe.timeoutSeconds | default 5 }}
-            failureThreshold: {{ .Values.app.startupProbe.failureThreshold | default 30 }}
+            failureThreshold: {{ .Values.app.startupProbe.failureThreshold | default 60 }}
           {{- end }}
           {{- if .Values.app.livenessProbe.enabled }}
           livenessProbe:
