@@ -25,14 +25,43 @@ app:
   # concurrency cap are both per-pod state. Scaling out needs a Postgres DSN swap first, not a replica
   # bump — see agent-service's own docs.
   replicas: 1
+  minReadySeconds: 30
+  progressDeadlineSeconds: 300
+  terminationGracePeriodSeconds: 30
   port: 8731
   pvcSize: 1Gi
   # Pre-existing Secret this Deployment references via envFrom — NOT created by this chart. See the
   # chart README's "Before first sync" section.
   secretName: agent-app
+  preStop:
+    enabled: true
+    sleepSeconds: 5
+  startupProbe:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
+  readinessProbe:
+    path: /healthz
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  livenessProbe:
+    path: /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
   resources:
     requests: {cpu: 250m, memory: 512Mi}
     limits: {cpu: "2", memory: 2Gi}
+  affinity: {}
+  topologySpreadConstraints: []
+  nodeSelector: {}
+  tolerations: []
   env:
     # Sovereign default: Apertus-1.5-70B driving Hermes' real loop directly.
     # Released weights are swiss-ai/Apertus-v1.5-70B (Apache-2.0, 2026-07-24); the apertus-ai/ id below
@@ -62,15 +91,49 @@ proxy:
   # MUST stay 1 — enforced by values.schema.json (maximum: 1). GRANT_MAX_REQUESTS and other admin caps
   # are per-replica in-memory; scaling needs those moved to shared state first.
   replicas: 1
+  minReadySeconds: 30
+  progressDeadlineSeconds: 300
+  terminationGracePeriodSeconds: 30
   port: 8732
   # Pre-existing Secret this Deployment references via envFrom — NOT created by this chart. See the
   # chart README's "Before first sync" section.
   secretName: agent-gateway
+  preStop:
+    enabled: true
+    sleepSeconds: 5
+  startupProbe:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
+  readinessProbe:
+    path: /healthz
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  livenessProbe:
+    path: /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
   resources:
     requests: {cpu: 100m, memory: 128Mi}
     limits: {cpu: "1", memory: 512Mi}
+  affinity: {}
+  topologySpreadConstraints: []
+  nodeSelector: {}
+  tolerations: []
   env:
     # Sovereign path: CSCS, the only route currently serving Apertus-1.5 (see app.env's AGENT_MODEL).
     MODEL_PROVIDERS: "cscs"
     PROVIDER_CSCS_BASE: "https://api.swissai.svc.cscs.ch/v1"
     GRANT_MAX_REQUESTS: "200" # gateway-side hard ceiling (defense-in-depth)
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+

@@ -14,12 +14,13 @@ spec:
   # replicas MUST stay 1 — see values.yaml's own comment; the SQLite task store and the in-memory
   # concurrency cap below are both per-pod state.
   replicas: {{ .Values.app.replicas }}
+  minReadySeconds: {{ .Values.app.minReadySeconds | default 30 }}
+  progressDeadlineSeconds: {{ .Values.app.progressDeadlineSeconds | default 300 }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
-  minReadySeconds: 30
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
@@ -29,6 +30,7 @@ spec:
         app: {{ .Release.Name }}-app
         plane: b
     spec:
+      terminationGracePeriodSeconds: {{ .Values.app.terminationGracePeriodSeconds | default 30 }}
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
@@ -37,6 +39,22 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
+      {{- with .Values.app.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: app
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -49,6 +67,12 @@ spec:
           command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", {{ .Values.app.port | quote }}]
           ports:
             - containerPort: {{ .Values.app.port }}
+          {{- if and .Values.app.preStop .Values.app.preStop.enabled }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "{{ .Values.app.preStop.sleepSeconds | default 5 }}"]
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.app.secretName }}
@@ -70,12 +94,32 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if and .Values.app.startupProbe .Values.app.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.app.startupProbe.path | default "/healthz" }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.startupProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.app.startupProbe.periodSeconds | default 5 }}
+            timeoutSeconds: {{ .Values.app.startupProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.app.startupProbe.failureThreshold | default 30 }}
+          {{- end }}
           readinessProbe:
-            httpGet: { path: /healthz, port: {{ .Values.app.port }} }
-            initialDelaySeconds: 3
+            httpGet:
+              path: {{ .Values.app.readinessProbe.path | default "/healthz" }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.readinessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.app.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.app.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.app.readinessProbe.failureThreshold | default 3 }}
           livenessProbe:
-            httpGet: { path: /healthz, port: {{ .Values.app.port }} }
-            periodSeconds: 20
+            httpGet:
+              path: {{ .Values.app.livenessProbe.path | default "/healthz" }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.app.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.app.livenessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.app.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.app.livenessProbe.failureThreshold | default 3 }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
       volumes:

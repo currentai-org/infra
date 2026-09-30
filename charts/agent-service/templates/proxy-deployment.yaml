@@ -13,12 +13,13 @@ metadata:
     plane: a
 spec:
   replicas: {{ .Values.proxy.replicas }}
+  minReadySeconds: {{ .Values.proxy.minReadySeconds | default 30 }}
+  progressDeadlineSeconds: {{ .Values.proxy.progressDeadlineSeconds | default 300 }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
-  minReadySeconds: 30
   selector:
     matchLabels:
       app: {{ .Release.Name }}-proxy
@@ -28,12 +29,29 @@ spec:
         app: {{ .Release.Name }}-proxy
         plane: a
     spec:
+      terminationGracePeriodSeconds: {{ .Values.proxy.terminationGracePeriodSeconds | default 30 }}
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
         seccompProfile:
           type: RuntimeDefault
+      {{- with .Values.proxy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.proxy.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.proxy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.proxy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: proxy
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -41,6 +59,12 @@ spec:
           command: ["uvicorn", "proxy:app", "--host", "0.0.0.0", "--port", {{ .Values.proxy.port | quote }}]
           ports:
             - containerPort: {{ .Values.proxy.port }}
+          {{- if and .Values.proxy.preStop .Values.proxy.preStop.enabled }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "{{ .Values.proxy.preStop.sleepSeconds | default 5 }}"]
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.proxy.secretName }}
@@ -54,11 +78,31 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          {{- if and .Values.proxy.startupProbe .Values.proxy.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.proxy.startupProbe.path | default "/healthz" }}
+              port: {{ .Values.proxy.port }}
+            initialDelaySeconds: {{ .Values.proxy.startupProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.proxy.startupProbe.periodSeconds | default 5 }}
+            timeoutSeconds: {{ .Values.proxy.startupProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.proxy.startupProbe.failureThreshold | default 30 }}
+          {{- end }}
           readinessProbe:
-            httpGet: { path: /healthz, port: {{ .Values.proxy.port }} }
-            initialDelaySeconds: 3
+            httpGet:
+              path: {{ .Values.proxy.readinessProbe.path | default "/healthz" }}
+              port: {{ .Values.proxy.port }}
+            initialDelaySeconds: {{ .Values.proxy.readinessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.proxy.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.proxy.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.proxy.readinessProbe.failureThreshold | default 3 }}
           livenessProbe:
-            httpGet: { path: /healthz, port: {{ .Values.proxy.port }} }
-            periodSeconds: 20
+            httpGet:
+              path: {{ .Values.proxy.livenessProbe.path | default "/healthz" }}
+              port: {{ .Values.proxy.port }}
+            initialDelaySeconds: {{ .Values.proxy.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.proxy.livenessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.proxy.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.proxy.livenessProbe.failureThreshold | default 3 }}
           resources:
             {{- toYaml .Values.proxy.resources | nindent 12 }}
