@@ -34,6 +34,12 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
     managedNamespaceMetadata:
       labels:
         # Gerbil needs NET_ADMIN for WireGuard; deployment.mode=single puts it in the same Pod as

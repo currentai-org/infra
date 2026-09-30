@@ -37,6 +37,7 @@ spec:
   {{- if $root.Values.runtime.minReadySeconds }}
   minReadySeconds: {{ $root.Values.runtime.minReadySeconds }}
   {{- end }}
+  progressDeadlineSeconds: 300
   {{- with $root.Values.runtime.updateStrategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -176,6 +177,10 @@ spec:
             - {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "5"]
           {{- with $pangolin.probes }}
           {{- if .startup }}
           startupProbe:
@@ -447,6 +452,10 @@ spec:
             - name: acme
               mountPath: /data
           {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "5"]
           {{- with $tf.probes }}
           {{- if .startup }}
           startupProbe:

@@ -24,7 +24,11 @@ metadata:
 spec:
   selector:
     matchLabels:
+      {{- if eq $root.Values.deployment.mode "single" }}
+      {{- include "pangolin.single.selectorLabels" $root | nindent 6 }}
+      {{- else }}
       {{- include "pangolin.pangolin.selectorLabels" $root | nindent 6 }}
+      {{- end }}
   {{- if $maxUnavailable }}
   maxUnavailable: {{ $maxUnavailable }}
   {{- else }}
@@ -85,7 +89,7 @@ spec:
   {{- end }}
 {{- end }}
 
-{{- if and $root.Values.traefik.enabled (eq $root.Values.deployment.type "standalone") }}
+{{- if and $root.Values.traefik.enabled (eq $root.Values.deployment.type "standalone") (eq $root.Values.deployment.mode "multi") }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

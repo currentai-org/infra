@@ -22,6 +22,14 @@ deployment:
   type: standalone # no cluster-wide Traefik/CRDs -- see LOCAL-PATCHES.md B1
   mode: single # Traefik needs gerbil's network namespace to reach the WireGuard interface -- B3
 
+runtime:
+  minReadySeconds: 30
+
+highAvailability:
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
 images:
   pangolinPostgresql:
     tag: "postgresql-1.23.0"
