@@ -65,6 +65,9 @@ data:
       disable_user_create_org: {{ $flags.disable_user_create_org | default false }}
       allow_raw_resources: {{ if hasKey $flags "allow_raw_resources" }}{{ get $flags "allow_raw_resources" }}{{ else }}true{{ end }}
       enable_integration_api: {{ $flags.enable_integration_api | default false }}
+      {{- if hasKey $flags "enable_acme_cert_sync" }}
+      enable_acme_cert_sync: {{ get $flags "enable_acme_cert_sync" }}
+      {{- end }}
       {{- if $flags.disable_local_sites }}
       disable_local_sites: {{ $flags.disable_local_sites }}
       {{- end }}

@@ -251,7 +251,14 @@ Pangolin starts. Returns an empty string for sqlite (no wait needed).
   {{- printf "%s-embedded-postgres" (include "pangolin.fullname" .) -}}
 {{- else if eq $mode "external" -}}
   {{- $extGen := default (dict) .Values.database.external.generatedSecret -}}
-  {{- default "" (get $extGen "host") -}}
+  {{- $host := default "" (get $extGen "host") -}}
+  {{- if not $host -}}
+    {{- $host = default "" .Values.database.external.host -}}
+  {{- end -}}
+  {{- if and (not $host) .Values.database.connection.existingSecretName -}}
+    {{- $host = "external" -}}
+  {{- end -}}
+  {{- $host -}}
 {{- end -}}
 {{- end -}}
 

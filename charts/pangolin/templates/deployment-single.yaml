@@ -417,7 +417,7 @@ spec:
             */}}
             - --entrypoints.traefik.address=:{{ $tf.config.adminPort | default 8085 }}
             - --providers.http.endpoint=http://127.0.0.1:{{ $root.Values.pangolin.service.ports.internalApi | default 3001 }}/api/v1/traefik-config
-            - --providers.http.pollInterval=5s
+            - --providers.http.pollInterval={{ $tf.config.pollInterval | default "5s" }}
             - --experimental.plugins.badger.moduleName=github.com/fosrl/badger
             - --experimental.plugins.badger.version=v1.4.1
             {{- if $tf.config.letsencryptEmail }}

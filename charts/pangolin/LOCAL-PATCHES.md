@@ -289,6 +289,13 @@ The upstream chart's deployment templates did not pass `--sni-port` in gerbil's 
 
 This moves Gerbil's SNI proxy listener to 8444, eliminating the port collision with Traefik.
 
+## B6 — ACME cert sync flag passthrough and external RDS resilience
+
+**Files patched:** `templates/configmap-pangolin.yaml`, `templates/_helpers.tpl`, `templates/deployment-single.yaml`.
+
+1. **`enable_acme_cert_sync` flag passthrough:** Upstream defaults `flags.enable_acme_cert_sync: true` in the Pangolin server image, causing a 5-second polling loop searching for `config/letsencrypt/acme.json` on disk. In environments terminating TLS at the cloud ingress/ALB, this produces endless `acmeCertSync: cannot stat path` warnings. Added passthrough of `enable_acme_cert_sync` in `templates/configmap-pangolin.yaml` so setting `pangolin.config.flags.enable_acme_cert_sync: false` properly disables the loop.
+2. **`wait-for-db` for external database with existingSecretName:** Upstream's `pangolin.db.waitHost` helper only returned a host for `cloudnativepg`, `embedded`, or `external.generatedSecret.host`. When connecting to an external database via `database.connection.existingSecretName` (such as AWS RDS), `pangolin.db.waitHost` returned empty, silently disabling the `wait-for-db` init container. Updated `_helpers.tpl` to return `"external"` when `database.connection.existingSecretName` is set, allowing `pg_isready -d "${POSTGRES_CONNECTION_STRING}"` to verify database readiness before startup.
+3. **Traefik `pollInterval` configurability:** In `templates/deployment-single.yaml`, made `--providers.http.pollInterval` configurable via `traefik.config.pollInterval` (defaulting to `5s`) so values overlays can tune polling frequency to damp connection churn during backend restarts.
 
 ## CloudNativePG comes bundled, not as a separate Application
 

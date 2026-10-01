@@ -60,6 +60,7 @@ currentai:
     dbPasswordArn: staging/aichat/database/password
     databaseName: pangolin
     sslMode: no-verify
+    extraParams: "keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=3"
   gerbilWireguardNlb:
     enabled: true
     annotations:
@@ -107,6 +108,14 @@ pangolin:
 
     flags:
       enable_integration_api: true # REQUIRED -- defaults false; this is what makes PANGOLIN_API_URL work
+      enable_acme_cert_sync: false # TLS terminates at AWS ALB; disables the 5s acme.json disk check loop
+
+    postgres:
+      enabled: true
+      pool:
+        max_connections: 10
+        idle_timeout_ms: 30000
+        connection_timeout_ms: 10000
 
     traefik:
       # Same "required non-empty but never actually used for ACME" situation as domains.*.cert_resolver
@@ -116,6 +125,12 @@ pangolin:
       # Deliberately naming THIS field "none" (not "letsencrypt") means nothing in this config block
       # points at the one resolver that does exist.
       cert_resolver: "none"
+
+runtime:
+  dependencyWait:
+    image:
+      repository: postgres
+      tag: 18.3-alpine
 
 gerbil:
   persistence:
@@ -137,6 +152,7 @@ traefik:
     # reading back every Service's type, not by reasoning about the values file.
     type: ClusterIP
   config:
+    pollInterval: 15s # damp provider polling to reduce connection refused log churn during restarts
     dynamicRouters:
       host: "pangolin.stg.aipotluck.org" # required non-empty by chart validation (PANGOLIN-043); this
       # chart doesn't render an Ingress/IngressRoute for it in standalone mode (see LOCAL-PATCHES.md),
