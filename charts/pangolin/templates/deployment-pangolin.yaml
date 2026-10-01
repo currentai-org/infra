@@ -108,8 +108,9 @@ spec:
               STABLE_SECONDS={{ $dbWait.stableSeconds | default 30 }}
               elapsed=0
               stable=0
+              CONN_STR="${POSTGRES_CONNECTION_STRING%%\?*}"
               while [ "${elapsed}" -lt "${TIMEOUT_SECONDS}" ]; do
-                if pg_isready -d "${POSTGRES_CONNECTION_STRING}" >/dev/null 2>&1; then
+                if pg_isready -d "${CONN_STR}" >/dev/null 2>&1; then
                   stable=$((stable + INTERVAL_SECONDS))
                   echo "PostgreSQL ready for ${stable}/${STABLE_SECONDS}s"
                   if [ "${stable}" -ge "${STABLE_SECONDS}" ]; then
