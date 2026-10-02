@@ -1,0 +1,19 @@
+models:
+  - model_name: smart-mistral
+    litellm_params:
+      model: auto_router/complexity_router
+      drop_params: true
+      complexity_router_config:
+        classifier_type: heuristic
+        complexity_router_default_model: mistralai/ministral-8b-2512
+        tiers:
+          SIMPLE:
+            - mistralai/ministral-3b-2512
+          MEDIUM:
+            - mistralai/ministral-8b-2512
+          COMPLEX:
+            - mistralai/mistral-small-2603
+          REASONING:
+            - mistralai/mistral-medium-3.1
+    model_info:
+      access_groups: ["public", "private"]

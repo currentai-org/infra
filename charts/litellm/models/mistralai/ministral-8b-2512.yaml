@@ -1,0 +1,8 @@
+models:
+- model_name: mistralai/ministral-8b-2512
+  litellm_params:
+    model: openai/mistralai/ministral-8b-2512
+    api_base: https://openrouter.ai/api/v1
+    api_key: os.environ/OPENROUTER_API_KEY
+  model_info:
+    access_groups: ["public", "private"]

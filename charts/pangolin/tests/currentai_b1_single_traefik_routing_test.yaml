@@ -1,0 +1,92 @@
+# currentai patch (B1, LOCAL-PATCHES.md). Upstream ships no coverage at all for the args this repo's
+# Traefik container actually needs: standalone_traefik_test.yaml only exercises the *multi*-mode
+# template (templates/deployment-traefik.yaml), but we run deployment.mode=single, whose Traefik
+# container lives in templates/deployment-single.yaml instead -- a template the upstream suite never
+# asserts args content on at all. Before the B1 patch this suite would fail: no --providers.http.*,
+# no badger plugin, no --entrypoints.traefik.address (so the shipped readiness/liveness probes on
+# :8085 can never pass, since nothing binds Traefik's --ping=true to an entrypoint of that name).
+suite: currentai B1 patch — single-mode Traefik gets HTTP-provider + badger routing
+templates:
+  - templates/deployment-single.yaml
+tests:
+  - it: wires providers.http at Pangolin's internal API instead of the unusable k8s providers
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --providers.http.endpoint=http://127.0.0.1:3001/api/v1/traefik-config
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --providers.http.pollInterval=5s
+      - notContains:
+          path: spec.template.spec.containers[2].args
+          content: --providers.kubernetescrd
+      - notContains:
+          path: spec.template.spec.containers[2].args
+          content: --providers.kubernetesingress
+
+  - it: enables the badger access-token plugin
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --experimental.plugins.badger.moduleName=github.com/fosrl/badger
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --experimental.plugins.badger.version=v1.4.1
+
+  - it: binds an entrypoint on the admin port so the shipped ping-based probes can pass
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --entrypoints.traefik.address=:8085
+
+  - it: follows a custom adminPort for both the entrypoint and the containerPort
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+      traefik.config.adminPort: 9999
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --entrypoints.traefik.address=:9999
+      - equal:
+          path: spec.template.spec.containers[2].ports[2].containerPort
+          value: 9999
+
+  - it: follows a custom Pangolin internal-api port for the HTTP provider endpoint
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+      pangolin.service.ports.internalApi: 4001
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --providers.http.endpoint=http://127.0.0.1:4001/api/v1/traefik-config

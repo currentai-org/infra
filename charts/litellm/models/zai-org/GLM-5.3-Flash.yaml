@@ -1,0 +1,37 @@
+models:
+- model_name: zai-org/GLM-5.3-Flash
+  litellm_params:
+    model: huggingface/zai-org/GLM-5.3-Flash:novita
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["private"]
+- model_name: zai-org/GLM-5.3-Flash
+  litellm_params:
+    model: huggingface/zai-org/GLM-5.3-Flash:together
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["private"]
+- model_name: zai-org/GLM-5.3-Flash
+  litellm_params:
+    model: huggingface/zai-org/GLM-5.3-Flash:deepinfra
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["private"]
+- model_name: zai-org/GLM-5.3-Flash
+  litellm_params:
+    model: huggingface/zai-org/GLM-5.3-Flash:zai-org
+    api_base: https://router.huggingface.co/v1
+    api_key: os.environ/HF_TOKEN
+    extra_headers:
+      X-HF-Bill-To: "current-ai-official"
+  model_info:
+    access_groups: ["private"]

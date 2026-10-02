@@ -4,18 +4,3 @@ domain: aipotluck.org
 # Please do not add other ingress groups names, they will create new load balancers.
 
 ingresses:
-  - enabled: true
-    name: simple-pod-ingress
-    namespace: experiment
-    ingressClassName: alb
-    host: simple-pod.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-public
-    targetService:
-      name: simple-pod-service
-      port: 80

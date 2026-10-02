@@ -1,0 +1,53 @@
+name: Helm Lint and Verify
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  helm-lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.12.0
+
+      - name: Run Helm Lint
+        run: |
+          for dir in charts/*/; do
+            if [ -d "$dir" ]; then
+              echo "Linting chart in $dir"
+              helm lint "$dir"
+            fi
+          done
+
+  chart-verify:
+    name: Verify Helm Charts
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.12.0
+
+      - name: Verify charts by running helm template
+        run: |
+          for dir in charts/*/; do
+            if [ -d "$dir" ]; then
+              chart_name=$(basename "$dir")
+              echo "Verifying chart $chart_name with helm template"
+              helm template "$chart_name" "$dir" > /dev/null
+            fi
+          done
+
+
