@@ -1,6 +1,6 @@
 pass_through_endpoints:
   - path: "/v1/cloudflare/clef"
-    target: "https://api.cloudflare.com/client/v4/accounts/os.environ/CLOUDFLARE_ACCOUNT_ID/ai/run/@cf/cloudflare/clef"
+    target: "https://api.cloudflare.com/client/v4/accounts/a94ae8014786226ffd2010fd5cd5a525/ai/run/@cf/cloudflare/clef"
     headers:
       Authorization: "Bearer os.environ/CLOUDFLARE_API_KEY"
       Content-Type: "application/json"
