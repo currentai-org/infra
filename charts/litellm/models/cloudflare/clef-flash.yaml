@@ -1,0 +1,8 @@
+models:
+- model_name: Cloudflare/clef-flash
+  litellm_params:
+    model: cloudflare/@cf/cloudflare/clef-flash
+    api_key: os.environ/CLOUDFLARE_API_KEY
+    supports_vision: true
+  model_info:
+    access_groups: ["public", "private"]

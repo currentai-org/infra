@@ -183,6 +183,18 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: impossibl_api_key
                   optional: true
+            - name: CLOUDFLARE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: cloudflare_api_key
+                  optional: true
+            - name: CLOUDFLARE_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: cloudflare_account_id
+                  optional: true
 
 
 
