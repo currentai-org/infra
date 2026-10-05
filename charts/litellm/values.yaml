@@ -96,6 +96,8 @@ serviceAccount:
 config:
   general_settings:
     store_prompts_in_spend_logs: true
+    maximum_spend_logs_retention_period: "7d"
+    maximum_spend_logs_retention_interval: "1d"
   litellm_settings:
     num_retries: 5
     allowed_fails: 1

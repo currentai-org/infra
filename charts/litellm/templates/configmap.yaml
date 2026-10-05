@@ -17,6 +17,12 @@ data:
       {{- else }}
       store_prompts_in_spend_logs: true
       {{- end }}
+      {{- if and .Values.config (hasKey .Values.config "general_settings") .Values.config.general_settings.maximum_spend_logs_retention_period }}
+      maximum_spend_logs_retention_period: {{ .Values.config.general_settings.maximum_spend_logs_retention_period | quote }}
+      {{- end }}
+      {{- if and .Values.config (hasKey .Values.config "general_settings") .Values.config.general_settings.maximum_spend_logs_retention_interval }}
+      maximum_spend_logs_retention_interval: {{ .Values.config.general_settings.maximum_spend_logs_retention_interval | quote }}
+      {{- end }}
       alerting: ["slack"]
       alert_types: [
         "llm_too_slow",
