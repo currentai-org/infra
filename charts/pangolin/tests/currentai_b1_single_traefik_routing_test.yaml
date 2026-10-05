@@ -90,3 +90,25 @@ tests:
       - contains:
           path: spec.template.spec.containers[2].args
           content: --providers.http.endpoint=http://127.0.0.1:4001/api/v1/traefik-config
+
+  - it: enables Prometheus metrics flags and names port metrics
+    set:
+      deployment.mode: single
+      deployment.type: standalone
+      traefik.enabled: true
+      traefik.config.letsencryptEmail: ops@example.com
+      traefik.config.dynamicRouters.host: pangolin.local
+    template: templates/deployment-single.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --metrics.prometheus=true
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --metrics.prometheus.entrypoint=traefik
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --metrics.prometheus.addserviceslabels=true
+      - equal:
+          path: spec.template.spec.containers[2].ports[2].name
+          value: metrics

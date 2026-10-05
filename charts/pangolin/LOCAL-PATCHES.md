@@ -134,6 +134,27 @@ diff /tmp/a.yaml /tmp/b.yaml && echo "stable"
 grep -c '^kind: Secret$' /tmp/a.yaml   # must be 0
 ```
 
+## B4 — Traefik Prometheus metrics exposure in single mode
+
+**File patched:** `templates/deployment-single.yaml` (the Traefik container block).
+
+By default in `deployment.mode=single`, Traefik runs with `--ping=true` on port 8085 but does not
+enable Prometheus metrics. To support Grafana dashboard observability (such as Grafana dashboards
+`17347` and `24593`) via Prometheus scraping without cluster-wide Traefik CRDs, the single-mode
+Traefik container args were patched to enable Prometheus metrics on the `traefik` entrypoint (:8085)
+with routers, services, and entrypoints label enrichment:
+
+```
+- --metrics.prometheus=true
+- --metrics.prometheus.entrypoint=traefik
+- --metrics.prometheus.addserviceslabels=true
+- --metrics.prometheus.addentrypointslabels=true
+- --metrics.prometheus.addrouterslabels=true
+```
+
+In addition, containerPort `8085` was given `name: metrics` instead of `admin`, matching Prometheus
+pod-scraping conventions.
+
 ## B3 — resolved by `deployment.mode: single`, not by a further patch
 
 Compose's local stack runs Traefik with `network_mode: service:gerbil` specifically so Traefik can

@@ -76,6 +76,12 @@ currentai:
       # vector. See LOCAL-PATCHES.md "Security and operability".
 
 pangolin:
+  deployment:
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8085"
+      prometheus.io/path: "/metrics"
+
   secret:
     # B2: the ExternalSecret above (currentai.serverSecretExternalSecret) creates this Secret name.
     # Setting existingSecretName skips the chart's own generated Secret entirely -- see
@@ -172,6 +178,14 @@ networkPolicy:
   pangolin:
     externalIngress:
       integration: true
+    extraIngress:
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: monitoring
+        ports:
+          - protocol: TCP
+            port: 8085
 
 # monitoring.enabled is already false by default -- leave it there until `kubectl get crd
 # servicemonitors.monitoring.coreos.com` confirms the Prometheus Operator is actually installed; an

@@ -428,6 +428,11 @@ spec:
             - --certificatesresolvers.letsencrypt.acme.delaybeforecheck={{ $tf.config.acmeDelayBeforeCheck }}
             {{- end }}
             {{- end }}
+            - --metrics.prometheus=true
+            - --metrics.prometheus.entrypoint=traefik
+            - --metrics.prometheus.addserviceslabels=true
+            - --metrics.prometheus.addentrypointslabels=true
+            - --metrics.prometheus.addrouterslabels=true
             {{- if $tf.config.insecureSkipVerify }}
             - --serversTransport.insecureskipverify={{ $tf.config.insecureSkipVerify }}
             {{- end }}
@@ -438,7 +443,7 @@ spec:
             - name: websecure
               containerPort: 8443
               protocol: TCP
-            - name: admin
+            - name: metrics
               containerPort: {{ $tf.config.adminPort | default 8085 }}
               protocol: TCP
           env:
