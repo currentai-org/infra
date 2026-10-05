@@ -50,85 +50,86 @@ data:
     \          \"datasource\": {\n            \"type\": \"loki\",\n            \"\
     uid\": \"Loki\"\n          },\n          \"direction\": \"backward\",\n      \
     \    \"editorMode\": \"code\",\n          \"expr\": \"sum(rate({service_name=\\\
-    \"traefik\\\"}[1m]))\",\n          \"queryType\": \"range\",\n          \"refId\"\
-    : \"A\"\n        }\n      ],\n      \"title\": \"RPS (1m)\",\n      \"type\":\
-    \ \"stat\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"loki\"\
-    ,\n        \"uid\": \"Loki\"\n      },\n      \"fieldConfig\": {\n        \"defaults\"\
-    : {\n          \"color\": {\n            \"mode\": \"thresholds\"\n          },\n\
-    \          \"decimals\": 0,\n          \"mappings\": [],\n          \"min\": 0,\n\
-    \          \"thresholds\": {\n            \"mode\": \"absolute\",\n          \
-    \  \"steps\": [\n              {\n                \"color\": \"green\",\n    \
-    \            \"value\": 0\n              },\n              {\n               \
-    \ \"color\": \"#EAB839\",\n                \"value\": 200\n              },\n\
-    \              {\n                \"color\": \"red\",\n                \"value\"\
-    : 500\n              }\n            ]\n          },\n          \"unit\": \"ms\"\
-    \n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n    \
-    \    \"h\": 5,\n        \"w\": 4,\n        \"x\": 3,\n        \"y\": 0\n     \
-    \ },\n      \"id\": 2,\n      \"options\": {\n        \"colorMode\": \"value\"\
-    ,\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"auto\",\n    \
-    \    \"orientation\": \"auto\",\n        \"percentChangeColorMode\": \"standard\"\
-    ,\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\
-    \n          ],\n          \"fields\": \"\",\n          \"limit\": 3,\n       \
-    \   \"values\": false\n        },\n        \"showPercentChange\": false,\n   \
-    \     \"textMode\": \"auto\",\n        \"wideLayout\": true\n      },\n      \"\
-    pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\"\
-    : {\n            \"type\": \"loki\",\n            \"uid\": \"Loki\"\n        \
-    \  },\n          \"direction\": \"backward\",\n          \"editorMode\": \"code\"\
-    ,\n          \"expr\": \"quantile_over_time(\\r\\n  0.95,\\r\\n  ({service_name=\\\
-    \"traefik\\\"} | json Duration | unwrap Duration)[5m]\\r\\n) by (service_name)\
-    \ / 1e6\\r\\n\",\n          \"legendFormat\": \"{{service_name}}\",\n        \
-    \  \"queryType\": \"range\",\n          \"refId\": \"A\"\n        }\n      ],\n\
-    \      \"title\": \"p95 latency (5m)\",\n      \"type\": \"stat\"\n    },\n  \
-    \  {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\"\
-    : \"Prometheus\"\n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n\
-    \          \"color\": {\n            \"mode\": \"continuous-GrYlRd\"\n       \
-    \   },\n          \"mappings\": [],\n          \"thresholds\": {\n           \
-    \ \"mode\": \"absolute\",\n            \"steps\": [\n              {\n       \
-    \         \"color\": \"green\",\n                \"value\": 0\n              },\n\
-    \              {\n                \"color\": \"red\",\n                \"value\"\
-    : 80\n              }\n            ]\n          }\n        },\n        \"overrides\"\
-    : []\n      },\n      \"gridPos\": {\n        \"h\": 5,\n        \"w\": 5,\n \
-    \       \"x\": 7,\n        \"y\": 0\n      },\n      \"id\": 3,\n      \"options\"\
-    : {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\",\n   \
-    \     \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n     \
-    \   \"percentChangeColorMode\": \"standard\",\n        \"reduceOptions\": {\n\
-    \          \"calcs\": [\n            \"lastNotNull\"\n          ],\n         \
-    \ \"fields\": \"\",\n          \"values\": false\n        },\n        \"showPercentChange\"\
-    : false,\n        \"textMode\": \"auto\",\n        \"wideLayout\": true\n    \
-    \  },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n\
-    \          \"datasource\": {\n            \"type\": \"prometheus\",\n        \
-    \    \"uid\": \"Prometheus\"\n          },\n          \"disableTextWrap\": false,\n\
-    \          \"editorMode\": \"code\",\n          \"exemplar\": false,\n       \
-    \   \"expr\": \"avg by (entrypoint) (traefik_open_connections_ratio)\",\n    \
-    \      \"fullMetaSearch\": false,\n          \"includeNullMetadata\": true,\n\
-    \          \"instant\": false,\n          \"key\": \"Q-7e0fd20e-acdd-47d5-b3c6-6665e485fdfc-0\"\
-    ,\n          \"legendFormat\": \"{{entrypoint}}\",\n          \"range\": true,\n\
-    \          \"refId\": \"A\",\n          \"useBackend\": false\n        }\n   \
-    \   ],\n      \"title\": \"Open Connections\",\n      \"type\": \"stat\"\n   \
-    \ },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n    \
-    \    \"uid\": \"Prometheus\"\n      },\n      \"fieldConfig\": {\n        \"defaults\"\
-    : {\n          \"color\": {\n            \"mode\": \"thresholds\"\n          },\n\
-    \          \"mappings\": [],\n          \"thresholds\": {\n            \"mode\"\
-    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
-    color\": \"green\",\n                \"value\": 0\n              },\n        \
-    \      {\n                \"color\": \"red\",\n                \"value\": 80\n\
-    \              }\n            ]\n          }\n        },\n        \"overrides\"\
-    : []\n      },\n      \"gridPos\": {\n        \"h\": 5,\n        \"w\": 2,\n \
-    \       \"x\": 12,\n        \"y\": 0\n      },\n      \"id\": 4,\n      \"options\"\
-    : {\n        \"colorMode\": \"none\",\n        \"graphMode\": \"none\",\n    \
-    \    \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n        \"\
-    percentChangeColorMode\": \"standard\",\n        \"reduceOptions\": {\n      \
-    \    \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
-    : \"\",\n          \"values\": false\n        },\n        \"showPercentChange\"\
-    : false,\n        \"textMode\": \"auto\",\n        \"wideLayout\": true\n    \
-    \  },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n\
-    \          \"datasource\": {\n            \"type\": \"prometheus\",\n        \
-    \    \"uid\": \"Prometheus\"\n          },\n          \"disableTextWrap\": false,\n\
-    \          \"editorMode\": \"builder\",\n          \"expr\": \"traefik_config_reloads_total\"\
-    ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\": true,\n\
-    \          \"instant\": false,\n          \"legendFormat\": \"__auto\",\n    \
-    \      \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
-    : false\n        }\n      ],\n      \"title\": \"Total Config Reload\",\n    \
+    \"pangolin\\\", container=\\\"traefik\\\"}[1m]))\",\n          \"queryType\":\
+    \ \"range\",\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\"\
+    : \"RPS (1m)\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\"\
+    : {\n        \"type\": \"loki\",\n        \"uid\": \"Loki\"\n      },\n      \"\
+    fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n          \
+    \  \"mode\": \"thresholds\"\n          },\n          \"decimals\": 0,\n      \
+    \    \"mappings\": [],\n          \"min\": 0,\n          \"thresholds\": {\n \
+    \           \"mode\": \"absolute\",\n            \"steps\": [\n              {\n\
+    \                \"color\": \"green\",\n                \"value\": 0\n       \
+    \       },\n              {\n                \"color\": \"#EAB839\",\n       \
+    \         \"value\": 200\n              },\n              {\n                \"\
+    color\": \"red\",\n                \"value\": 500\n              }\n         \
+    \   ]\n          },\n          \"unit\": \"ms\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"gridPos\": {\n        \"h\": 5,\n        \"w\": 4,\n \
+    \       \"x\": 3,\n        \"y\": 0\n      },\n      \"id\": 2,\n      \"options\"\
+    : {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n   \
+    \     \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n       \
+    \ \"percentChangeColorMode\": \"standard\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"\
+    fields\": \"\",\n          \"limit\": 3,\n          \"values\": false\n      \
+    \  },\n        \"showPercentChange\": false,\n        \"textMode\": \"auto\",\n\
+    \        \"wideLayout\": true\n      },\n      \"pluginVersion\": \"12.3.0\",\n\
+    \      \"targets\": [\n        {\n          \"datasource\": {\n            \"\
+    type\": \"loki\",\n            \"uid\": \"Loki\"\n          },\n          \"direction\"\
+    : \"backward\",\n          \"editorMode\": \"code\",\n          \"expr\": \"quantile_over_time(\\\
+    r\\n  0.95,\\r\\n  ({service_name=\\\"pangolin\\\", container=\\\"traefik\\\"\
+    } | json Duration | unwrap Duration)[5m]\\r\\n) by (service_name) / 1e6\\r\\n\"\
+    ,\n          \"legendFormat\": \"{{service_name}}\",\n          \"queryType\"\
+    : \"range\",\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\"\
+    : \"p95 latency (5m)\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n    \
+    \  },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\"\
+    : {\n            \"mode\": \"continuous-GrYlRd\"\n          },\n          \"mappings\"\
+    : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n    \
+    \        \"steps\": [\n              {\n                \"color\": \"green\",\n\
+    \                \"value\": 0\n              },\n              {\n           \
+    \     \"color\": \"red\",\n                \"value\": 80\n              }\n  \
+    \          ]\n          }\n        },\n        \"overrides\": []\n      },\n \
+    \     \"gridPos\": {\n        \"h\": 5,\n        \"w\": 5,\n        \"x\": 7,\n\
+    \        \"y\": 0\n      },\n      \"id\": 3,\n      \"options\": {\n        \"\
+    colorMode\": \"value\",\n        \"graphMode\": \"none\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"percentChangeColorMode\"\
+    : \"standard\",\n        \"reduceOptions\": {\n          \"calcs\": [\n      \
+    \      \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"\
+    values\": false\n        },\n        \"showPercentChange\": false,\n        \"\
+    textMode\": \"auto\",\n        \"wideLayout\": true\n      },\n      \"pluginVersion\"\
+    : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+    \            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n\
+    \          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+    : \"code\",\n          \"exemplar\": false,\n          \"expr\": \"avg by (entrypoint)\
+    \ (traefik_open_connections_ratio)\",\n          \"fullMetaSearch\": false,\n\
+    \          \"includeNullMetadata\": true,\n          \"instant\": false,\n   \
+    \       \"key\": \"Q-7e0fd20e-acdd-47d5-b3c6-6665e485fdfc-0\",\n          \"legendFormat\"\
+    : \"{{entrypoint}}\",\n          \"range\": true,\n          \"refId\": \"A\"\
+    ,\n          \"useBackend\": false\n        }\n      ],\n      \"title\": \"Open\
+    \ Connections\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n    \
+    \  },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\"\
+    : {\n            \"mode\": \"thresholds\"\n          },\n          \"mappings\"\
+    : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n    \
+    \        \"steps\": [\n              {\n                \"color\": \"green\",\n\
+    \                \"value\": 0\n              },\n              {\n           \
+    \     \"color\": \"red\",\n                \"value\": 80\n              }\n  \
+    \          ]\n          }\n        },\n        \"overrides\": []\n      },\n \
+    \     \"gridPos\": {\n        \"h\": 5,\n        \"w\": 2,\n        \"x\": 12,\n\
+    \        \"y\": 0\n      },\n      \"id\": 4,\n      \"options\": {\n        \"\
+    colorMode\": \"none\",\n        \"graphMode\": \"none\",\n        \"justifyMode\"\
+    : \"auto\",\n        \"orientation\": \"auto\",\n        \"percentChangeColorMode\"\
+    : \"standard\",\n        \"reduceOptions\": {\n          \"calcs\": [\n      \
+    \      \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"\
+    values\": false\n        },\n        \"showPercentChange\": false,\n        \"\
+    textMode\": \"auto\",\n        \"wideLayout\": true\n      },\n      \"pluginVersion\"\
+    : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+    \            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n\
+    \          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+    : \"builder\",\n          \"expr\": \"traefik_config_reloads_total\",\n      \
+    \    \"fullMetaSearch\": false,\n          \"includeNullMetadata\": true,\n  \
+    \        \"instant\": false,\n          \"legendFormat\": \"__auto\",\n      \
+    \    \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\":\
+    \ false\n        }\n      ],\n      \"title\": \"Total Config Reload\",\n    \
     \  \"type\": \"stat\"\n    },\n    {\n      \"datasource\": {\n        \"type\"\
     : \"loki\",\n        \"uid\": \"Loki\"\n      },\n      \"description\": \"\"\
     ,\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n\
@@ -149,55 +150,56 @@ data:
     \          \"datasource\": {\n            \"type\": \"loki\",\n            \"\
     uid\": \"Loki\"\n          },\n          \"direction\": \"backward\",\n      \
     \    \"editorMode\": \"code\",\n          \"expr\": \"sum(count_over_time({service_name=\\\
-    \"traefik\\\"}  |= \\\"RequestProtocol\\\" [$__interval]))\",\n          \"legendFormat\"\
-    : \"\",\n          \"queryType\": \"range\",\n          \"refId\": \"A\"\n   \
-    \     }\n      ],\n      \"timeFrom\": \"1h\",\n      \"title\": \"Total requests\
-    \  \",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": {\n   \
-    \     \"type\": \"loki\",\n        \"uid\": \"Loki\"\n      },\n      \"description\"\
-    : \"\",\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"mappings\"\
-    : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n    \
-    \        \"steps\": [\n              {\n                \"color\": \"transparent\"\
-    ,\n                \"value\": 0\n              }\n            ]\n          },\n\
-    \          \"unit\": \"decbytes\"\n        },\n        \"overrides\": [\n    \
-    \      {\n            \"matcher\": {\n              \"id\": \"byName\",\n    \
-    \          \"options\": \"IP Address\"\n            },\n            \"properties\"\
-    : []\n          }\n        ]\n      },\n      \"gridPos\": {\n        \"h\": 5,\n\
-    \        \"w\": 2,\n        \"x\": 18,\n        \"y\": 0\n      },\n      \"id\"\
-    : 6,\n      \"interval\": \"15m\",\n      \"options\": {\n        \"colorMode\"\
-    : \"background\",\n        \"graphMode\": \"none\",\n        \"justifyMode\":\
-    \ \"center\",\n        \"orientation\": \"auto\",\n        \"percentChangeColorMode\"\
-    : \"standard\",\n        \"reduceOptions\": {\n          \"calcs\": [\n      \
-    \      \"sum\"\n          ],\n          \"fields\": \"\",\n          \"values\"\
-    : false\n        },\n        \"showPercentChange\": false,\n        \"textMode\"\
-    : \"value\",\n        \"wideLayout\": true\n      },\n      \"pluginVersion\"\
-    : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
-    \            \"type\": \"loki\",\n            \"uid\": \"Loki\"\n          },\n\
-    \          \"direction\": \"backward\",\n          \"editorMode\": \"code\",\n\
-    \          \"expr\": \"sum_over_time({service_name=\\\"traefik\\\"}|= \\\"RequestProtocol\\\
-    \" | json | OriginStatus=200 | unwrap DownstreamContentSize |  __error__=\\\"\\\
-    \" [$__interval])\",\n          \"legendFormat\": \"Bytes sent\",\n          \"\
-    queryType\": \"range\",\n          \"refId\": \"A\",\n          \"step\": \"15m\"\
-    \n        }\n      ],\n      \"timeFrom\": \"15m\",\n      \"title\": \"Total\
-    \ Bytes Sent\",\n      \"transformations\": [\n        {\n          \"id\": \"\
-    reduce\",\n          \"options\": {\n            \"reducers\": [\n           \
-    \   \"sum\"\n            ]\n          }\n        },\n        {\n          \"id\"\
-    : \"organize\",\n          \"options\": {\n            \"excludeByName\": {},\n\
-    \            \"indexByName\": {},\n            \"renameByName\": {\n         \
-    \     \"Total\": \"Bytes Sent\"\n            }\n          }\n        }\n     \
-    \ ],\n      \"type\": \"stat\"\n    },\n    {\n      \"gridPos\": {\n        \"\
-    h\": 12,\n        \"w\": 4,\n        \"x\": 20,\n        \"y\": 0\n      },\n\
-    \      \"id\": 7,\n      \"options\": {\n        \"code\": {\n          \"language\"\
-    : \"markdown\",\n          \"showLineNumbers\": false,\n          \"showMiniMap\"\
-    : false\n        },\n        \"content\": \"| Code | Status | Meaning |\\n| :---\
-    \ | :--- | :--- |\\n| **200** | \U0001F7E2 OK | Success |\\n| **302** | \U0001F535\
-    \ Found | Temporary redirect |\\n| **304** | \U0001F535 Not Modified | Loaded\
-    \ from Cache |\\n| **400** | \U0001F7E0 Bad Request | Malformed syntax / Validation\
-    \ error |\\n| **401** | \U0001F7E0 Unauthorized | Invalid or missing API key |\\\
-    n| **403** | \U0001F7E0 Forbidden | Valid auth, but permissions denied |\\n| **404**\
-    \ | \U0001F7E0 Not Found | Resource does not exist |\\n| **499** | \U0001F534\
-    \ Client Closed | Browser canceled request early |\\n| **502** | \U0001F534 Bad\
-    \ Gateway | Upstream server is down/unreachable |\",\n        \"mode\": \"markdown\"\
-    \n      },\n      \"pluginVersion\": \"12.3.0\",\n      \"transparent\": true,\n\
+    \"pangolin\\\", container=\\\"traefik\\\"}  |= \\\"RequestProtocol\\\" [$__interval]))\"\
+    ,\n          \"legendFormat\": \"\",\n          \"queryType\": \"range\",\n  \
+    \        \"refId\": \"A\"\n        }\n      ],\n      \"timeFrom\": \"1h\",\n\
+    \      \"title\": \"Total requests  \",\n      \"type\": \"stat\"\n    },\n  \
+    \  {\n      \"datasource\": {\n        \"type\": \"loki\",\n        \"uid\": \"\
+    Loki\"\n      },\n      \"description\": \"\",\n      \"fieldConfig\": {\n   \
+    \     \"defaults\": {\n          \"mappings\": [],\n          \"thresholds\":\
+    \ {\n            \"mode\": \"absolute\",\n            \"steps\": [\n         \
+    \     {\n                \"color\": \"transparent\",\n                \"value\"\
+    : 0\n              }\n            ]\n          },\n          \"unit\": \"decbytes\"\
+    \n        },\n        \"overrides\": [\n          {\n            \"matcher\":\
+    \ {\n              \"id\": \"byName\",\n              \"options\": \"IP Address\"\
+    \n            },\n            \"properties\": []\n          }\n        ]\n   \
+    \   },\n      \"gridPos\": {\n        \"h\": 5,\n        \"w\": 2,\n        \"\
+    x\": 18,\n        \"y\": 0\n      },\n      \"id\": 6,\n      \"interval\": \"\
+    15m\",\n      \"options\": {\n        \"colorMode\": \"background\",\n       \
+    \ \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n        \"orientation\"\
+    : \"auto\",\n        \"percentChangeColorMode\": \"standard\",\n        \"reduceOptions\"\
+    : {\n          \"calcs\": [\n            \"sum\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        },\n        \"showPercentChange\"\
+    : false,\n        \"textMode\": \"value\",\n        \"wideLayout\": true\n   \
+    \   },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n\
+    \          \"datasource\": {\n            \"type\": \"loki\",\n            \"\
+    uid\": \"Loki\"\n          },\n          \"direction\": \"backward\",\n      \
+    \    \"editorMode\": \"code\",\n          \"expr\": \"sum_over_time({service_name=\\\
+    \"pangolin\\\", container=\\\"traefik\\\"}|= \\\"RequestProtocol\\\" | json |\
+    \ OriginStatus=200 | unwrap DownstreamContentSize |  __error__=\\\"\\\" [$__interval])\"\
+    ,\n          \"legendFormat\": \"Bytes sent\",\n          \"queryType\": \"range\"\
+    ,\n          \"refId\": \"A\",\n          \"step\": \"15m\"\n        }\n     \
+    \ ],\n      \"timeFrom\": \"15m\",\n      \"title\": \"Total Bytes Sent\",\n \
+    \     \"transformations\": [\n        {\n          \"id\": \"reduce\",\n     \
+    \     \"options\": {\n            \"reducers\": [\n              \"sum\"\n   \
+    \         ]\n          }\n        },\n        {\n          \"id\": \"organize\"\
+    ,\n          \"options\": {\n            \"excludeByName\": {},\n            \"\
+    indexByName\": {},\n            \"renameByName\": {\n              \"Total\":\
+    \ \"Bytes Sent\"\n            }\n          }\n        }\n      ],\n      \"type\"\
+    : \"stat\"\n    },\n    {\n      \"gridPos\": {\n        \"h\": 12,\n        \"\
+    w\": 4,\n        \"x\": 20,\n        \"y\": 0\n      },\n      \"id\": 7,\n  \
+    \    \"options\": {\n        \"code\": {\n          \"language\": \"markdown\"\
+    ,\n          \"showLineNumbers\": false,\n          \"showMiniMap\": false\n \
+    \       },\n        \"content\": \"| Code | Status | Meaning |\\n| :--- | :---\
+    \ | :--- |\\n| **200** | \U0001F7E2 OK | Success |\\n| **302** | \U0001F535 Found\
+    \ | Temporary redirect |\\n| **304** | \U0001F535 Not Modified | Loaded from Cache\
+    \ |\\n| **400** | \U0001F7E0 Bad Request | Malformed syntax / Validation error\
+    \ |\\n| **401** | \U0001F7E0 Unauthorized | Invalid or missing API key |\\n| **403**\
+    \ | \U0001F7E0 Forbidden | Valid auth, but permissions denied |\\n| **404** |\
+    \ \U0001F7E0 Not Found | Resource does not exist |\\n| **499** | \U0001F534 Client\
+    \ Closed | Browser canceled request early |\\n| **502** | \U0001F534 Bad Gateway\
+    \ | Upstream server is down/unreachable |\",\n        \"mode\": \"markdown\"\n\
+    \      },\n      \"pluginVersion\": \"12.3.0\",\n      \"transparent\": true,\n\
     \      \"type\": \"text\"\n    },\n    {\n      \"datasource\": {\n        \"\
     type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n      },\n      \"description\"\
     : \"\",\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\"\
@@ -302,63 +304,64 @@ data:
     : \"loki\",\n            \"uid\": \"Loki\"\n          },\n          \"direction\"\
     : \"backward\",\n          \"editorMode\": \"code\",\n          \"expr\": \"sum\
     \ by (DownstreamStatus) (\\r\\n  count_over_time(\\r\\n    {service_name=\\\"\
-    traefik\\\"}\\r\\n      |~ \\\"^\\\\\\\\{\\\"\\r\\n      | json\\r\\n      | __error__=\\\
-    \"\\\"\\r\\n      | DownstreamStatus!=\\\"0\\\"\\r\\n      | DownstreamStatus!=\\\
-    \"\\\"\\r\\n  [$__range])\\r\\n)\\r\\n\",\n          \"legendFormat\": \"HTTP\
-    \ Status: {{DownstreamStatus}}\",\n          \"queryType\": \"range\",\n     \
-    \     \"refId\": \"A\",\n          \"step\": \"30s\"\n        }\n      ],\n  \
-    \    \"title\": \"Requests per status code\",\n      \"type\": \"stat\"\n    },\n\
-    \    {\n      \"datasource\": {\n        \"type\": \"loki\",\n        \"uid\"\
-    : \"Loki\"\n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n    \
-    \      \"color\": {\n            \"mode\": \"continuous-GrYlRd\"\n          },\n\
-    \          \"custom\": {\n            \"hideFrom\": {\n              \"legend\"\
-    : false,\n              \"tooltip\": false,\n              \"viz\": false\n  \
-    \          }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n         \
-    \     {\n                \"color\": \"green\",\n                \"value\": 0\n\
-    \              },\n              {\n                \"color\": \"red\",\n    \
-    \            \"value\": 80\n              }\n            ]\n          },\n   \
-    \       \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n\
-    \      \"gridPos\": {\n        \"h\": 12,\n        \"w\": 10,\n        \"x\":\
-    \ 10,\n        \"y\": 10\n      },\n      \"id\": 10,\n      \"options\": {\n\
-    \        \"basemap\": {\n          \"config\": {\n            \"showLabels\":\
-    \ true,\n            \"theme\": \"auto\"\n          },\n          \"name\": \"\
-    Layer 0\",\n          \"noRepeat\": false,\n          \"opacity\": 0.9,\n    \
-    \      \"type\": \"default\"\n        },\n        \"controls\": {\n          \"\
-    mouseWheelZoom\": true,\n          \"showAttribution\": false,\n          \"showDebug\"\
-    : false,\n          \"showMeasure\": false,\n          \"showScale\": false,\n\
-    \          \"showZoom\": true\n        },\n        \"layers\": [\n          {\n\
-    \            \"config\": {\n              \"showLegend\": true,\n            \
-    \  \"style\": {\n                \"color\": {\n                  \"fixed\": \"\
-    dark-green\"\n                },\n                \"opacity\": 0.5,\n        \
-    \        \"rotation\": {\n                  \"field\": \"request_Cf_Ipcountry\"\
-    ,\n                  \"fixed\": 0,\n                  \"max\": 360,\n        \
-    \          \"min\": -360,\n                  \"mode\": \"mod\"\n             \
-    \   },\n                \"size\": {\n                  \"fixed\": 10,\n      \
-    \            \"max\": 15,\n                  \"min\": 2\n                },\n\
-    \                \"symbol\": {\n                  \"fixed\": \"img/icons/marker/circle.svg\"\
-    ,\n                  \"mode\": \"fixed\"\n                },\n               \
-    \ \"symbolAlign\": {\n                  \"horizontal\": \"center\",\n        \
-    \          \"vertical\": \"center\"\n                },\n                \"text\"\
-    : {\n                  \"field\": \"Country\",\n                  \"fixed\": \"\
-    \",\n                  \"mode\": \"field\"\n                },\n             \
-    \   \"textConfig\": {\n                  \"fontSize\": 12,\n                 \
-    \ \"offsetX\": 0,\n                  \"offsetY\": 0,\n                  \"textAlign\"\
-    : \"center\",\n                  \"textBaseline\": \"middle\"\n              \
-    \  }\n              }\n            },\n            \"filterData\": {\n       \
-    \       \"id\": \"byRefId\",\n              \"options\": \"A\"\n            },\n\
-    \            \"layer-tooltip\": true,\n            \"location\": {\n         \
-    \     \"lookup\": \"Country\",\n              \"mode\": \"lookup\"\n         \
-    \   },\n            \"name\": \"Layer 1\",\n            \"tooltip\": true,\n \
-    \           \"type\": \"markers\"\n          }\n        ],\n        \"tooltip\"\
-    : {\n          \"mode\": \"details\"\n        },\n        \"view\": {\n      \
-    \    \"allLayers\": true,\n          \"id\": \"coords\",\n          \"lat\": 50.139755,\n\
-    \          \"lon\": -9.164776,\n          \"noRepeat\": false,\n          \"zoom\"\
-    : 1\n        }\n      },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\"\
-    : [\n        {\n          \"datasource\": {\n            \"type\": \"loki\",\n\
-    \            \"uid\": \"Loki\"\n          },\n          \"direction\": \"backward\"\
-    ,\n          \"editorMode\": \"code\",\n          \"expr\": \"topk(20,\\r\\n \
-    \ sum by (request_Cf_Ipcountry) (\\r\\n    count_over_time(\\r\\n      {service_name=\\\
+    pangolin\\\", container=\\\"traefik\\\"}\\r\\n      |~ \\\"^\\\\\\\\{\\\"\\r\\\
+    n      | json\\r\\n      | __error__=\\\"\\\"\\r\\n      | DownstreamStatus!=\\\
+    \"0\\\"\\r\\n      | DownstreamStatus!=\\\"\\\"\\r\\n  [$__range])\\r\\n)\\r\\\
+    n\",\n          \"legendFormat\": \"HTTP Status: {{DownstreamStatus}}\",\n   \
+    \       \"queryType\": \"range\",\n          \"refId\": \"A\",\n          \"step\"\
+    : \"30s\"\n        }\n      ],\n      \"title\": \"Requests per status code\"\
+    ,\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": {\n        \"\
+    type\": \"loki\",\n        \"uid\": \"Loki\"\n      },\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"\
+    continuous-GrYlRd\"\n          },\n          \"custom\": {\n            \"hideFrom\"\
+    : {\n              \"legend\": false,\n              \"tooltip\": false,\n   \
+    \           \"viz\": false\n            }\n          },\n          \"mappings\"\
+    : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n    \
+    \        \"steps\": [\n              {\n                \"color\": \"green\",\n\
+    \                \"value\": 0\n              },\n              {\n           \
+    \     \"color\": \"red\",\n                \"value\": 80\n              }\n  \
+    \          ]\n          },\n          \"unit\": \"short\"\n        },\n      \
+    \  \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 12,\n   \
+    \     \"w\": 10,\n        \"x\": 10,\n        \"y\": 10\n      },\n      \"id\"\
+    : 10,\n      \"options\": {\n        \"basemap\": {\n          \"config\": {\n\
+    \            \"showLabels\": true,\n            \"theme\": \"auto\"\n        \
+    \  },\n          \"name\": \"Layer 0\",\n          \"noRepeat\": false,\n    \
+    \      \"opacity\": 0.9,\n          \"type\": \"default\"\n        },\n      \
+    \  \"controls\": {\n          \"mouseWheelZoom\": true,\n          \"showAttribution\"\
+    : false,\n          \"showDebug\": false,\n          \"showMeasure\": false,\n\
+    \          \"showScale\": false,\n          \"showZoom\": true\n        },\n \
+    \       \"layers\": [\n          {\n            \"config\": {\n              \"\
+    showLegend\": true,\n              \"style\": {\n                \"color\": {\n\
+    \                  \"fixed\": \"dark-green\"\n                },\n           \
+    \     \"opacity\": 0.5,\n                \"rotation\": {\n                  \"\
+    field\": \"request_Cf_Ipcountry\",\n                  \"fixed\": 0,\n        \
+    \          \"max\": 360,\n                  \"min\": -360,\n                 \
+    \ \"mode\": \"mod\"\n                },\n                \"size\": {\n       \
+    \           \"fixed\": 10,\n                  \"max\": 15,\n                 \
+    \ \"min\": 2\n                },\n                \"symbol\": {\n            \
+    \      \"fixed\": \"img/icons/marker/circle.svg\",\n                  \"mode\"\
+    : \"fixed\"\n                },\n                \"symbolAlign\": {\n        \
+    \          \"horizontal\": \"center\",\n                  \"vertical\": \"center\"\
+    \n                },\n                \"text\": {\n                  \"field\"\
+    : \"Country\",\n                  \"fixed\": \"\",\n                  \"mode\"\
+    : \"field\"\n                },\n                \"textConfig\": {\n         \
+    \         \"fontSize\": 12,\n                  \"offsetX\": 0,\n             \
+    \     \"offsetY\": 0,\n                  \"textAlign\": \"center\",\n        \
+    \          \"textBaseline\": \"middle\"\n                }\n              }\n\
+    \            },\n            \"filterData\": {\n              \"id\": \"byRefId\"\
+    ,\n              \"options\": \"A\"\n            },\n            \"layer-tooltip\"\
+    : true,\n            \"location\": {\n              \"lookup\": \"Country\",\n\
+    \              \"mode\": \"lookup\"\n            },\n            \"name\": \"\
+    Layer 1\",\n            \"tooltip\": true,\n            \"type\": \"markers\"\n\
+    \          }\n        ],\n        \"tooltip\": {\n          \"mode\": \"details\"\
+    \n        },\n        \"view\": {\n          \"allLayers\": true,\n          \"\
+    id\": \"coords\",\n          \"lat\": 50.139755,\n          \"lon\": -9.164776,\n\
+    \          \"noRepeat\": false,\n          \"zoom\": 1\n        }\n      },\n\
+    \      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n     \
+    \     \"datasource\": {\n            \"type\": \"loki\",\n            \"uid\"\
+    : \"Loki\"\n          },\n          \"direction\": \"backward\",\n          \"\
+    editorMode\": \"code\",\n          \"expr\": \"topk(20,\\r\\n  sum by (request_Cf_Ipcountry)\
+    \ (\\r\\n    count_over_time(\\r\\n      {service_name=\\\"pangolin\\\", container=\\\
     \"traefik\\\"} |= \\\"RequestProtocol\\\"\\r\\n      | json | __error__=\\\"\\\
     \"\\r\\n      | request_Cf_Ipcountry=~\\\"[A-Z]{2}\\\"\\r\\n    [$__range])\\\
     r\\n  )\\r\\n)\\r\\n\",\n          \"legendFormat\": \"{{request_Cf_Ipcountry}}\"\
@@ -431,22 +434,23 @@ data:
     \         \"uid\": \"Loki\"\n          },\n          \"direction\": \"backward\"\
     ,\n          \"editorMode\": \"code\",\n          \"expr\": \"topk(20,\\r\\n \
     \ sum by (request_X_Real_Ip) (\\r\\n    count_over_time(\\r\\n      {service_name=\\\
-    \"traefik\\\"} |= \\\"RequestProtocol\\\"\\r\\n      | json | __error__=\\\"\\\
-    \"\\r\\n      | request_Cf_Ipcountry=~\\\"[A-Z]{2}\\\"\\r\\n    [$__range])\\\
-    r\\n  )\\r\\n)\\r\\n\",\n          \"legendFormat\": \"{{request_Cf_Ipcountry}}\"\
-    ,\n          \"queryType\": \"instant\",\n          \"refId\": \"A\",\n      \
-    \    \"step\": \"\"\n        }\n      ],\n      \"timeFrom\": \"24h\",\n     \
-    \ \"transformations\": [\n        {\n          \"id\": \"organize\",\n       \
-    \   \"options\": {\n            \"excludeByName\": {\n              \"Time\":\
-    \ true\n            },\n            \"includeByName\": {},\n            \"indexByName\"\
-    : {},\n            \"renameByName\": {\n              \"Value #A\": \"Count\"\
-    ,\n              \"request_Cf_Ipcountry\": \"Country\",\n              \"request_X_Real_Ip\"\
-    : \"Public IP\"\n            }\n          }\n        }\n      ],\n      \"type\"\
-    : \"table\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\"\
-    ,\n        \"uid\": \"Prometheus\"\n      },\n      \"fieldConfig\": {\n     \
-    \   \"defaults\": {\n          \"color\": {\n            \"mode\": \"palette-classic\"\
-    \n          },\n          \"custom\": {\n            \"axisBorderShow\": false,\n\
-    \            \"axisCenteredZero\": false,\n            \"axisColorMode\": \"text\"\
+    \"pangolin\\\", container=\\\"traefik\\\"} |= \\\"RequestProtocol\\\"\\r\\n  \
+    \    | json | __error__=\\\"\\\"\\r\\n      | request_Cf_Ipcountry=~\\\"[A-Z]{2}\\\
+    \"\\r\\n    [$__range])\\r\\n  )\\r\\n)\\r\\n\",\n          \"legendFormat\":\
+    \ \"{{request_Cf_Ipcountry}}\",\n          \"queryType\": \"instant\",\n     \
+    \     \"refId\": \"A\",\n          \"step\": \"\"\n        }\n      ],\n     \
+    \ \"timeFrom\": \"24h\",\n      \"transformations\": [\n        {\n          \"\
+    id\": \"organize\",\n          \"options\": {\n            \"excludeByName\":\
+    \ {\n              \"Time\": true\n            },\n            \"includeByName\"\
+    : {},\n            \"indexByName\": {},\n            \"renameByName\": {\n   \
+    \           \"Value #A\": \"Count\",\n              \"request_Cf_Ipcountry\":\
+    \ \"Country\",\n              \"request_X_Real_Ip\": \"Public IP\"\n         \
+    \   }\n          }\n        }\n      ],\n      \"type\": \"table\"\n    },\n \
+    \   {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
+    uid\": \"Prometheus\"\n      },\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\n            \"mode\": \"palette-classic\"\n     \
+    \     },\n          \"custom\": {\n            \"axisBorderShow\": false,\n  \
+    \          \"axisCenteredZero\": false,\n            \"axisColorMode\": \"text\"\
     ,\n            \"axisLabel\": \"\",\n            \"axisPlacement\": \"auto\",\n\
     \            \"barAlignment\": 0,\n            \"barWidthFactor\": 0.6,\n    \
     \        \"drawStyle\": \"line\",\n            \"fillOpacity\": 10,\n        \
@@ -492,89 +496,51 @@ data:
     : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
     \            \"type\": \"loki\",\n            \"uid\": \"Loki\"\n          },\n\
     \          \"direction\": \"backward\",\n          \"editorMode\": \"code\",\n\
-    \          \"expr\": \"{service_name=\\\"traefik\\\"} |= \\\"RequestProtocol\\\
-    \" | json  | line_format \\\"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}}\
-    \ IP {{.request_Cf_Connecting_Ip}} {{.request_X_Real_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}}\
-    \ Route To {{.ServiceAddr}}\\\"\",\n          \"legendFormat\": \"\",\n      \
-    \    \"queryType\": \"range\",\n          \"refId\": \"A\"\n        }\n      ],\n\
-    \      \"timeFrom\": \"15m\",\n      \"title\": \"Access Logs\",\n      \"type\"\
-    : \"logs\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"loki\"\
-    ,\n        \"uid\": \"Loki\"\n      },\n      \"gridPos\": {\n        \"h\": 12,\n\
-    \        \"w\": 24,\n        \"x\": 0,\n        \"y\": 31\n      },\n      \"\
-    id\": 16,\n      \"options\": {\n        \"dedupStrategy\": \"none\",\n      \
-    \  \"detailsMode\": \"sidebar\",\n        \"enableInfiniteScrolling\": false,\n\
-    \        \"enableLogDetails\": true,\n        \"prettifyLogMessage\": false,\n\
-    \        \"showControls\": false,\n        \"showLabels\": false,\n        \"\
-    showTime\": true,\n        \"sortOrder\": \"Descending\",\n        \"syntaxHighlighting\"\
-    : true,\n        \"wrapLogMessage\": false\n      },\n      \"pluginVersion\"\
-    : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
-    \            \"type\": \"loki\",\n            \"uid\": \"Loki\"\n          },\n\
-    \          \"direction\": \"backward\",\n          \"editorMode\": \"code\",\n\
-    \          \"expr\": \"{service_name=\\\"traefik\\\"} \\r\\n| detected_level=\\\
-    \"info\\\" \\r\\n| DownstreamStatus != 200\\r\\n| DownstreamStatus!=\\\"0\\\"\\\
-    r\\n| OriginStatus!=\\\"0\\\"\\r\\n| DownstreamStatus!=\\\"\\\"\\r\\n| line_format\
-    \ \\\"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}}\
+    \          \"expr\": \"{service_name=\\\"pangolin\\\", container=\\\"traefik\\\
+    \"} |= \\\"RequestProtocol\\\" | json  | line_format \\\"Status: {{.OriginStatus}}\
+    \ Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.request_X_Real_Ip}}\
     \ {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\\\
-    \"\",\n          \"queryType\": \"range\",\n          \"refId\": \"A\"\n     \
-    \   }\n      ],\n      \"title\": \" Error Logs\",\n      \"transformations\"\
-    : [\n        {\n          \"id\": \"filterByValue\",\n          \"options\": {\n\
-    \            \"filters\": [\n              {\n                \"config\": {\n\
-    \                  \"id\": \"substring\",\n                  \"options\": {\n\
-    \                    \"value\": \"api.daddylars.dk\"\n                  }\n  \
-    \              },\n                \"fieldName\": \"Line\"\n              }\n\
-    \            ],\n            \"match\": \"any\",\n            \"type\": \"exclude\"\
-    \n          }\n        }\n      ],\n      \"type\": \"logs\"\n    },\n    {\n\
-    \      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":\
-    \ \"Prometheus\"\n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n\
-    \          \"color\": {\n            \"mode\": \"palette-classic\"\n         \
-    \ },\n          \"custom\": {\n            \"axisBorderShow\": false,\n      \
-    \      \"axisCenteredZero\": false,\n            \"axisColorMode\": \"text\",\n\
-    \            \"axisLabel\": \"\",\n            \"axisPlacement\": \"auto\",\n\
-    \            \"barAlignment\": 0,\n            \"barWidthFactor\": 0.6,\n    \
-    \        \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n         \
-    \   \"gradientMode\": \"none\",\n            \"hideFrom\": {\n              \"\
-    legend\": false,\n              \"tooltip\": false,\n              \"viz\": false\n\
-    \            },\n            \"insertNulls\": false,\n            \"lineInterpolation\"\
-    : \"linear\",\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n\
-    \            \"scaleDistribution\": {\n              \"type\": \"linear\"\n  \
-    \          },\n            \"showPoints\": \"auto\",\n            \"showValues\"\
-    : false,\n            \"spanNulls\": false,\n            \"stacking\": {\n   \
-    \           \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n\
-    \            \"thresholdsStyle\": {\n              \"mode\": \"off\"\n       \
-    \     }\n          },\n          \"mappings\": [],\n          \"thresholds\":\
-    \ {\n            \"mode\": \"absolute\",\n            \"steps\": [\n         \
-    \     {\n                \"color\": \"green\",\n                \"value\": 0\n\
-    \              },\n              {\n                \"color\": \"red\",\n    \
-    \            \"value\": 80\n              }\n            ]\n          }\n    \
-    \    },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n        \"\
-    h\": 13,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 43\n      },\n\
-    \      \"id\": 17,\n      \"options\": {\n        \"legend\": {\n          \"\
-    calcs\": [],\n          \"displayMode\": \"list\",\n          \"placement\": \"\
-    right\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n\
-    \          \"hideZeros\": false,\n          \"mode\": \"single\",\n          \"\
-    sort\": \"none\"\n        }\n      },\n      \"pluginVersion\": \"12.3.0\",\n\
-    \      \"targets\": [\n        {\n          \"datasource\": {\n            \"\
-    type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n          },\n \
-    \         \"disableTextWrap\": false,\n          \"editorMode\": \"code\",\n \
-    \         \"exemplar\": false,\n          \"expr\": \"traefik_service_requests_total\"\
-    ,\n          \"format\": \"time_series\",\n          \"fullMetaSearch\": false,\n\
-    \          \"includeNullMetadata\": false,\n          \"instant\": false,\n  \
-    \        \"interval\": \"10s\",\n          \"legendFormat\": \"{{service}}\",\n\
-    \          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
-    : false\n        }\n      ],\n      \"title\": \"traefik service requests_total\"\
-    ,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\n  \
-    \      \"type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n      },\n\
-    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n \
-    \           \"mode\": \"palette-classic\"\n          },\n          \"custom\"\
+    \"\",\n          \"legendFormat\": \"\",\n          \"queryType\": \"range\",\n\
+    \          \"refId\": \"A\"\n        }\n      ],\n      \"timeFrom\": \"15m\"\
+    ,\n      \"title\": \"Access Logs\",\n      \"type\": \"logs\"\n    },\n    {\n\
+    \      \"datasource\": {\n        \"type\": \"loki\",\n        \"uid\": \"Loki\"\
+    \n      },\n      \"gridPos\": {\n        \"h\": 12,\n        \"w\": 24,\n   \
+    \     \"x\": 0,\n        \"y\": 31\n      },\n      \"id\": 16,\n      \"options\"\
+    : {\n        \"dedupStrategy\": \"none\",\n        \"detailsMode\": \"sidebar\"\
+    ,\n        \"enableInfiniteScrolling\": false,\n        \"enableLogDetails\":\
+    \ true,\n        \"prettifyLogMessage\": false,\n        \"showControls\": false,\n\
+    \        \"showLabels\": false,\n        \"showTime\": true,\n        \"sortOrder\"\
+    : \"Descending\",\n        \"syntaxHighlighting\": true,\n        \"wrapLogMessage\"\
+    : false\n      },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n\
+    \        {\n          \"datasource\": {\n            \"type\": \"loki\",\n   \
+    \         \"uid\": \"Loki\"\n          },\n          \"direction\": \"backward\"\
+    ,\n          \"editorMode\": \"code\",\n          \"expr\": \"{service_name=\\\
+    \"pangolin\\\", container=\\\"traefik\\\"} \\r\\n| detected_level=\\\"info\\\"\
+    \ \\r\\n| DownstreamStatus != 200\\r\\n| DownstreamStatus!=\\\"0\\\"\\r\\n| OriginStatus!=\\\
+    \"0\\\"\\r\\n| DownstreamStatus!=\\\"\\\"\\r\\n| line_format \\\"Status: {{.OriginStatus}}\
+    \ Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.RequestMethod}}\
+    \ {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\\\"\",\n        \
+    \  \"queryType\": \"range\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \" Error Logs\",\n      \"transformations\": [\n        {\n\
+    \          \"id\": \"filterByValue\",\n          \"options\": {\n            \"\
+    filters\": [\n              {\n                \"config\": {\n               \
+    \   \"id\": \"substring\",\n                  \"options\": {\n               \
+    \     \"value\": \"api.daddylars.dk\"\n                  }\n                },\n\
+    \                \"fieldName\": \"Line\"\n              }\n            ],\n  \
+    \          \"match\": \"any\",\n            \"type\": \"exclude\"\n          }\n\
+    \        }\n      ],\n      \"type\": \"logs\"\n    },\n    {\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n    \
+    \  },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\"\
+    : {\n            \"mode\": \"palette-classic\"\n          },\n          \"custom\"\
     : {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
     : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
     : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
     : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
-    ,\n            \"fillOpacity\": 10,\n            \"gradientMode\": \"none\",\n\
+    ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
     \            \"hideFrom\": {\n              \"legend\": false,\n             \
     \ \"tooltip\": false,\n              \"viz\": false\n            },\n        \
     \    \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\",\n\
-    \            \"lineWidth\": 2,\n            \"pointSize\": 5,\n            \"\
+    \            \"lineWidth\": 1,\n            \"pointSize\": 5,\n            \"\
     scaleDistribution\": {\n              \"type\": \"linear\"\n            },\n \
     \           \"showPoints\": \"auto\",\n            \"showValues\": false,\n  \
     \          \"spanNulls\": false,\n            \"stacking\": {\n              \"\
@@ -584,20 +550,58 @@ data:
     \      \"mode\": \"absolute\",\n            \"steps\": [\n              {\n  \
     \              \"color\": \"green\",\n                \"value\": 0\n         \
     \     },\n              {\n                \"color\": \"red\",\n             \
-    \   \"value\": 80\n              }\n            ]\n          },\n          \"\
-    unit\": \"reqps\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
-    : {\n        \"h\": 10,\n        \"w\": 8,\n        \"x\": 0,\n        \"y\":\
-    \ 56\n      },\n      \"id\": 18,\n      \"options\": {\n        \"legend\": {\n\
-    \          \"calcs\": [\n            \"last\",\n            \"mean\",\n      \
-    \      \"max\"\n          ],\n          \"displayMode\": \"table\",\n        \
-    \  \"placement\": \"bottom\",\n          \"showLegend\": true,\n          \"sortBy\"\
-    : \"Max\",\n          \"sortDesc\": true\n        },\n        \"tooltip\": {\n\
-    \          \"hideZeros\": false,\n          \"maxHeight\": 600,\n          \"\
-    mode\": \"single\",\n          \"sort\": \"none\"\n        }\n      },\n     \
-    \ \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n          \"\
-    datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"\
-    Prometheus\"\n          },\n          \"editorMode\": \"code\",\n          \"\
-    expr\": \"sum by(router) (rate(traefik_router_requests_total[$__rate_interval]))\"\
+    \   \"value\": 80\n              }\n            ]\n          }\n        },\n \
+    \       \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 13,\n\
+    \        \"w\": 24,\n        \"x\": 0,\n        \"y\": 43\n      },\n      \"\
+    id\": 17,\n      \"options\": {\n        \"legend\": {\n          \"calcs\": [],\n\
+    \          \"displayMode\": \"list\",\n          \"placement\": \"right\",\n \
+    \         \"showLegend\": true\n        },\n        \"tooltip\": {\n         \
+    \ \"hideZeros\": false,\n          \"mode\": \"single\",\n          \"sort\":\
+    \ \"none\"\n        }\n      },\n      \"pluginVersion\": \"12.3.0\",\n      \"\
+    targets\": [\n        {\n          \"datasource\": {\n            \"type\": \"\
+    prometheus\",\n            \"uid\": \"Prometheus\"\n          },\n          \"\
+    disableTextWrap\": false,\n          \"editorMode\": \"code\",\n          \"exemplar\"\
+    : false,\n          \"expr\": \"traefik_service_requests_total\",\n          \"\
+    format\": \"time_series\",\n          \"fullMetaSearch\": false,\n          \"\
+    includeNullMetadata\": false,\n          \"instant\": false,\n          \"interval\"\
+    : \"10s\",\n          \"legendFormat\": \"{{service}}\",\n          \"range\"\
+    : true,\n          \"refId\": \"A\",\n          \"useBackend\": false\n      \
+    \  }\n      ],\n      \"title\": \"traefik service requests_total\",\n      \"\
+    type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"type\"\
+    : \"prometheus\",\n        \"uid\": \"Prometheus\"\n      },\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"\
+    palette-classic\"\n          },\n          \"custom\": {\n            \"axisBorderShow\"\
+    : false,\n            \"axisCenteredZero\": false,\n            \"axisColorMode\"\
+    : \"text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\":\
+    \ \"auto\",\n            \"barAlignment\": 0,\n            \"barWidthFactor\"\
+    : 0.6,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 10,\n\
+    \            \"gradientMode\": \"none\",\n            \"hideFrom\": {\n      \
+    \        \"legend\": false,\n              \"tooltip\": false,\n             \
+    \ \"viz\": false\n            },\n            \"insertNulls\": false,\n      \
+    \      \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 2,\n   \
+    \         \"pointSize\": 5,\n            \"scaleDistribution\": {\n          \
+    \    \"type\": \"linear\"\n            },\n            \"showPoints\": \"auto\"\
+    ,\n            \"showValues\": false,\n            \"spanNulls\": false,\n   \
+    \         \"stacking\": {\n              \"group\": \"A\",\n              \"mode\"\
+    : \"none\"\n            },\n            \"thresholdsStyle\": {\n             \
+    \ \"mode\": \"off\"\n            }\n          },\n          \"mappings\": [],\n\
+    \          \"thresholds\": {\n            \"mode\": \"absolute\",\n          \
+    \  \"steps\": [\n              {\n                \"color\": \"green\",\n    \
+    \            \"value\": 0\n              },\n              {\n               \
+    \ \"color\": \"red\",\n                \"value\": 80\n              }\n      \
+    \      ]\n          },\n          \"unit\": \"reqps\"\n        },\n        \"\
+    overrides\": []\n      },\n      \"gridPos\": {\n        \"h\": 10,\n        \"\
+    w\": 8,\n        \"x\": 0,\n        \"y\": 56\n      },\n      \"id\": 18,\n \
+    \     \"options\": {\n        \"legend\": {\n          \"calcs\": [\n        \
+    \    \"last\",\n            \"mean\",\n            \"max\"\n          ],\n   \
+    \       \"displayMode\": \"table\",\n          \"placement\": \"bottom\",\n  \
+    \        \"showLegend\": true,\n          \"sortBy\": \"Max\",\n          \"sortDesc\"\
+    : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+    \          \"maxHeight\": 600,\n          \"mode\": \"single\",\n          \"\
+    sort\": \"none\"\n        }\n      },\n      \"pluginVersion\": \"12.3.0\",\n\
+    \      \"targets\": [\n        {\n          \"datasource\": {\n            \"\
+    type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n          },\n \
+    \         \"editorMode\": \"code\",\n          \"expr\": \"sum by(router) (rate(traefik_router_requests_total[$__rate_interval]))\"\
     ,\n          \"instant\": false,\n          \"legendFormat\": \"__auto\",\n  \
     \        \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n \
     \     \"title\": \"Requests per Router\",\n      \"type\": \"timeseries\"\n  \

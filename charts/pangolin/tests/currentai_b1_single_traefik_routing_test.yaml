@@ -109,6 +109,9 @@ tests:
       - contains:
           path: spec.template.spec.containers[2].args
           content: --metrics.prometheus.addserviceslabels=true
+      - contains:
+          path: spec.template.spec.containers[2].args
+          content: --accesslog.format=json
       - equal:
           path: spec.template.spec.containers[2].ports[2].name
           value: metrics

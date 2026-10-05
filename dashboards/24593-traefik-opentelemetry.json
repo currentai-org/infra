@@ -165,7 +165,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(rate({service_name=\"traefik\"}[1m]))",
+          "expr": "sum(rate({service_name=\"pangolin\", container=\"traefik\"}[1m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -241,7 +241,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "quantile_over_time(\r\n  0.95,\r\n  ({service_name=\"traefik\"} | json Duration | unwrap Duration)[5m]\r\n) by (service_name) / 1e6\r\n",
+          "expr": "quantile_over_time(\r\n  0.95,\r\n  ({service_name=\"pangolin\", container=\"traefik\"} | json Duration | unwrap Duration)[5m]\r\n) by (service_name) / 1e6\r\n",
           "legendFormat": "{{service_name}}",
           "queryType": "range",
           "refId": "A"
@@ -457,7 +457,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=\"traefik\"}  |= \"RequestProtocol\" [$__interval]))",
+          "expr": "sum(count_over_time({service_name=\"pangolin\", container=\"traefik\"}  |= \"RequestProtocol\" [$__interval]))",
           "legendFormat": "",
           "queryType": "range",
           "refId": "A"
@@ -531,7 +531,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum_over_time({service_name=\"traefik\"}|= \"RequestProtocol\" | json | OriginStatus=200 | unwrap DownstreamContentSize |  __error__=\"\" [$__interval])",
+          "expr": "sum_over_time({service_name=\"pangolin\", container=\"traefik\"}|= \"RequestProtocol\" | json | OriginStatus=200 | unwrap DownstreamContentSize |  __error__=\"\" [$__interval])",
           "legendFormat": "Bytes sent",
           "queryType": "range",
           "refId": "A",
@@ -888,7 +888,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (DownstreamStatus) (\r\n  count_over_time(\r\n    {service_name=\"traefik\"}\r\n      |~ \"^\\\\{\"\r\n      | json\r\n      | __error__=\"\"\r\n      | DownstreamStatus!=\"0\"\r\n      | DownstreamStatus!=\"\"\r\n  [$__range])\r\n)\r\n",
+          "expr": "sum by (DownstreamStatus) (\r\n  count_over_time(\r\n    {service_name=\"pangolin\", container=\"traefik\"}\r\n      |~ \"^\\\\{\"\r\n      | json\r\n      | __error__=\"\"\r\n      | DownstreamStatus!=\"0\"\r\n      | DownstreamStatus!=\"\"\r\n  [$__range])\r\n)\r\n",
           "legendFormat": "HTTP Status: {{DownstreamStatus}}",
           "queryType": "range",
           "refId": "A",
@@ -1037,7 +1037,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20,\r\n  sum by (request_Cf_Ipcountry) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
+          "expr": "topk(20,\r\n  sum by (request_Cf_Ipcountry) (\r\n    count_over_time(\r\n      {service_name=\"pangolin\", container=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
           "legendFormat": "{{request_Cf_Ipcountry}}",
           "queryType": "instant",
           "refId": "A",
@@ -1244,7 +1244,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
+          "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"pangolin\", container=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
           "legendFormat": "{{request_Cf_Ipcountry}}",
           "queryType": "instant",
           "refId": "A",
@@ -1412,7 +1412,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"} |= \"RequestProtocol\" | json  | line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.request_X_Real_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"pangolin\", container=\"traefik\"} |= \"RequestProtocol\" | json  | line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.request_X_Real_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
           "legendFormat": "",
           "queryType": "range",
           "refId": "A"
@@ -1456,7 +1456,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"} \r\n| detected_level=\"info\" \r\n| DownstreamStatus != 200\r\n| DownstreamStatus!=\"0\"\r\n| OriginStatus!=\"0\"\r\n| DownstreamStatus!=\"\"\r\n| line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"pangolin\", container=\"traefik\"} \r\n| detected_level=\"info\" \r\n| DownstreamStatus != 200\r\n| DownstreamStatus!=\"0\"\r\n| OriginStatus!=\"0\"\r\n| DownstreamStatus!=\"\"\r\n| line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
           "queryType": "range",
           "refId": "A"
         }

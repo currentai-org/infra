@@ -403,6 +403,7 @@ spec:
             - --ping=true
             - --log.level={{ $tf.config.logLevel | default "INFO" }}
             - --accesslog=true
+            - --accesslog.format=json
             - --entrypoints.web.address=:8000
             - --entrypoints.websecure.address=:8443
             {{- /*

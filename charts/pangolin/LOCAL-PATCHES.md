@@ -153,7 +153,8 @@ with routers, services, and entrypoints label enrichment:
 ```
 
 In addition, containerPort `8085` was given `name: metrics` instead of `admin`, matching Prometheus
-pod-scraping conventions.
+pod-scraping conventions, and `--accesslog.format=json` was added to output structured JSON access logs
+for Loki parsing (required by Grafana dashboard 24593).
 
 ## B3 — resolved by `deployment.mode: single`, not by a further patch
 
