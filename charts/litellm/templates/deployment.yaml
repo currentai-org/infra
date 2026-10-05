@@ -195,6 +195,13 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: cloudflare_account_id
                   optional: true
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: mistral_api_key
+                  optional: true
+
 
 
 

@@ -1,7 +1,7 @@
 models:
-- model_name: mistralai/mistral-small-2603
+- model_name: mistralai/ministral-14b-2512
   litellm_params:
-    model: openai/mistral-small-latest
+    model: openai/ministral-14b-latest
     api_base: https://api.mistral.ai/v1
     api_key: os.environ/MISTRAL_API_KEY
   model_info:
