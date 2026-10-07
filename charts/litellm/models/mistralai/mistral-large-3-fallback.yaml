@@ -1,0 +1,8 @@
+models:
+- model_name: mistralai/mistral-large-3-fallback
+  litellm_params:
+    model: bedrock/mistral.mistral-large-3-675b-instruct
+    aws_region_name: us-east-1
+    api_key: os.environ/BEDROCK_API_KEY
+  model_info:
+    access_groups: ["fallback"] #even though this is in another access group it can still be accessed when used as a fallback.

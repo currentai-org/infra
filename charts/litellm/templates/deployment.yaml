@@ -201,6 +201,18 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: mistral_api_key
                   optional: true
+            - name: BEDROCK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: bedrock_api_key
+                  optional: true
+            - name: AWS_BEARER_TOKEN_BEDROCK
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: aws_bearer_token_bedrock
+                  optional: true
 
 
 

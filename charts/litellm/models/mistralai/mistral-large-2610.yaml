@@ -6,3 +6,6 @@ models:
     api_key: os.environ/MISTRAL_API_KEY
   model_info:
     access_groups: ["public", "private"]
+
+fallbacks:
+  - mistralai/mistral-large-3-fallback
