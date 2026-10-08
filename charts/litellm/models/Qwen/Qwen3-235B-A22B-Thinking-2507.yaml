@@ -7,7 +7,7 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["public", "private"]
+    access_groups: ["private"]
 - model_name: Qwen/Qwen3-235B-A22B-Thinking-2507
   litellm_params:
     model: huggingface/Qwen/Qwen3-235B-A22B-Thinking-2507:novita
@@ -16,4 +16,4 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["public", "private"]
+    access_groups: ["private"]

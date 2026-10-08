@@ -213,6 +213,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: aws_bearer_token_bedrock
                   optional: true
+            - name: BIELIK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: bielik_api_key
+                  optional: true
 
 
 

@@ -8,7 +8,7 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["public", "private"]
+    access_groups: ["private"]
 - model_name: Qwen/Qwen3.8-27B
   litellm_params:
     model: huggingface/Qwen/Qwen3.8-27B:deepinfra
@@ -18,7 +18,7 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["public", "private"]
+    access_groups: ["private"]
 - model_name: Qwen/Qwen3.8-27B
   litellm_params:
     model: huggingface/Qwen/Qwen3.8-27B:ovhcloud
@@ -28,4 +28,4 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["public", "private"]
+    access_groups: ["private"]
