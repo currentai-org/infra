@@ -5,8 +5,8 @@ global:
 app:
   name: litellm
   image:
-    repository: docker.litellm.ai/berriai/litellm
-    tag: v1.99.0
+    repository: ghcr.io/forpublicai/litellm-v2
+    tag: "pai-v1.104.2"
     pullPolicy: IfNotPresent
   replicas: 2
   minReadySeconds: 35
