@@ -4,4 +4,4 @@ models:
     model: bedrock/mistral.mistral-large-3-675b-instruct
     aws_region_name: us-east-1
   model_info:
-    access_groups: ["fallback"] #even though this is in another access group it can still be accessed when used as a fallback.
+    access_groups: ["public","private","fallback"] #even though this is in another access group it can still be accessed when used as a fallback.
