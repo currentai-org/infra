@@ -1,0 +1,7 @@
+pass_through_endpoints:
+  - path: "/v1/systemone"
+    target: "https://api.impossibl.com/v1/systemone"
+    headers:
+      Authorization: "Bearer os.environ/IMPOSSIBL_API_KEY"
+      Content-Type: "application/json"
+    forward_headers: true

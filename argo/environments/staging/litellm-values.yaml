@@ -1,0 +1,31 @@
+# Staging environment configuration for LiteLLM
+global:
+  environment: staging
+  namespace: currentai-router
+
+secrets:
+  name: litellm-secrets
+  manualSecretsName: /router-aipotluck-org
+  managedSecretsName: staging/aichat/open-webui/managed-secrets
+  dbPasswordArn: staging/aichat/database/password
+
+env:
+  aws_region: us-east-1
+  litellmRedisPort: "6379"
+  litellmRedisNamespace: litellm_cai
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::818561370924:role/AmazonEKS_LiteLLM_Role
+
+prometheus:
+  enabled: true
+
+config:
+  general_settings:
+    store_prompts_in_spend_logs: false
+    maximum_spend_logs_retention_period: "7d"
+    maximum_spend_logs_retention_interval: "1d"
+  litellm_settings:
+    cache_params:
+      namespace: litellm_cai.caching
