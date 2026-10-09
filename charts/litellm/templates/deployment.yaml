@@ -135,6 +135,10 @@ spec:
               value: "{{ .Values.env.litellmRedisPort }}"
             - name: LITELLM_REDIS_PORT
               value: "{{ .Values.env.litellmRedisPort }}"
+            - name: REDIS_NAMESPACE
+              value: "{{ .Values.env.litellmRedisNamespace | default "litellm_cai" }}"
+            - name: LITELLM_REDIS_NAMESPACE
+              value: "{{ .Values.env.litellmRedisNamespace | default "litellm_cai" }}"
             - name: SEALION_API_KEY
               valueFrom:
                 secretKeyRef:

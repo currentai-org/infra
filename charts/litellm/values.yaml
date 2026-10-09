@@ -110,6 +110,7 @@ config:
       ttl: 600
 secrets:
   name: litellm-secrets
+  databaseName: litellm_cai
   manualSecretsName: ""
   managedSecretsName: ""
   dbPasswordArn: ""
