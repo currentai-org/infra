@@ -2,17 +2,17 @@ environments:
   - staging
   - prod
 models:
-- model_name: swiss-ai/apertus-v1.5-70b
-  litellm_params:
-    model: openai/swiss-ai/Apertus-v1.5-70B
-    api_base: https://api.featherless.ai/v1
-    api_key: os.environ/FEATHERLESS_API_KEY
-  model_info:
-    access_groups: ["public", "private"]
 #- model_name: swiss-ai/apertus-v1.5-70b
 #  litellm_params:
 #    model: openai/swiss-ai/Apertus-v1.5-70B
-#    api_base: https://api.infomaniak.com/2/ai/106744/openai/v1
-#    api_key: os.environ/INFOMANIAK_API_KEY
+#    api_base: https://api.featherless.ai/v1
+#    api_key: os.environ/FEATHERLESS_API_KEY
 #  model_info:
 #    access_groups: ["public", "private"]
+- model_name: swiss-ai/apertus-v1.5-70b
+  litellm_params:
+    model: openai/swiss-ai/Apertus-v1.5-70B
+    api_base: https://api.infomaniak.com/2/ai/106744/openai/v1
+    api_key: os.environ/INFOMANIAK_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
