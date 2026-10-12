@@ -7,7 +7,7 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["private"]
+    access_groups: ["public","private"]
 - model_name: zai-org/GLM-5.3
   litellm_params:
     model: huggingface/zai-org/GLM-5.3:together
@@ -16,16 +16,16 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["private"]
-- model_name: zai-org/GLM-5.3
-  litellm_params:
-    model: huggingface/zai-org/GLM-5.3:zai-org
-    api_base: https://router.huggingface.co/v1
-    api_key: os.environ/HF_TOKEN
-    extra_headers:
-      X-HF-Bill-To: "current-ai-official"
-  model_info:
-    access_groups: ["private"]
+    access_groups: ["public","private"]
+#- model_name: zai-org/GLM-5.3
+#  litellm_params:
+#    model: huggingface/zai-org/GLM-5.3:zai-org
+#    api_base: https://router.huggingface.co/v1
+#    api_key: os.environ/HF_TOKEN
+#    extra_headers:
+#      X-HF-Bill-To: "current-ai-official"
+#  model_info:
+#    access_groups: ["public","private"]
 - model_name: zai-org/GLM-5.3
   litellm_params:
     model: huggingface/zai-org/GLM-5.3:deepinfra
@@ -34,4 +34,4 @@ models:
     extra_headers:
       X-HF-Bill-To: "current-ai-official"
   model_info:
-    access_groups: ["private"]
+    access_groups: ["public","private"]
