@@ -229,6 +229,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: phoeniqs_api_key
                   optional: true
+            - name: SCALEWAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: scaleway_api_key
+                  optional: true
 
 
 
