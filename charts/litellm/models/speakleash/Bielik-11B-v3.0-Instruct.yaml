@@ -1,0 +1,8 @@
+models:
+- model_name: speakleash/Bielik-11B-v3.0-Instruct
+  litellm_params:
+    model: openai/speakleash/Bielik-11B-v3.0-Instruct
+    api_base: https://llmlab.plgrid.pl/api/v1
+    api_key: os.environ/BIELIK_API_KEY
+  model_info:
+    access_groups: ["public", "private"]

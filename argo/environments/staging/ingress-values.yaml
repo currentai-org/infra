@@ -1,14 +1,18 @@
-domain: ai-staging.chat
+domain: stg.aipotluck.org
 
 # Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
 # Please do not add other ingress groups names, they will create new load balancers.
 
 ingresses:
+  # agent-app only — never agent-proxy, which holds the real model credential and must stay
+  # unreachable from outside the cluster (the chart's own NetworkPolicy already restricts its ingress
+  # to agent-app alone). healthcheck-path is required: agent-app's /healthz doesn't serve on `/`, so
+  # without it the ALB marks every target unhealthy.
   - enabled: true
-    name: simple-pod-ingress
-    namespace: experiment
+    name: agent-service-ingress
+    namespace: agent-service
     ingressClassName: alb
-    host: simple-pod.{{ .Values.domain }}
+    host: agent-service.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
@@ -16,23 +20,121 @@ ingresses:
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
     targetService:
-      name: simple-pod-service
+      name: agent-service-app
       port: 80
+  - enabled: true
+    name: router-ingress
+    namespace: currentai-router
+    ingressClassName: alb
+    host: router.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/healthcheck-path: /health/liveliness
+    targetService:
+      name: litellm-service
+      port: 4000
+
+  # --- Pangolin (CUR-1266 managed local-inference, charts/pangolin) -------------------------------
+  # Split across two ALB groups deliberately -- see charts/pangolin/LOCAL-PATCHES.md "Hostname
+  # layout": the dashboard is a full admin UI that can mint tunnels/API keys, so it does not share a
+  # load balancer with public traffic. All three entries reference a literal ACM cert ARN rather than
+  # relying on auto-discovery (unlike agent-service/router above) -- the ARN below MUST be filled in
+  # with the real cert covering pangolin.{domain}, pangolin-api.{domain}, and *.tunnel.{domain} before
+  # the first sync (see "Prerequisites" in LOCAL-PATCHES.md). Do NOT set the shared certificateArn at
+  # the top of this file instead -- that value is shared by every entry above and would repoint
+  # agent-service/router's certs too.
+  - enabled: true
+    name: pangolin-dashboard-ingress
+    namespace: currentai-pangolin
+    ingressClassName: alb
+    host: pangolin.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/4550d60e-fcaa-4d5c-b78d-39276afaccf2"
+      alb.ingress.kubernetes.io/group.name: currentai-admin
+      alb.ingress.kubernetes.io/healthcheck-path: /
+      # newt (the tunnel client) dials this same host as its control channel over a long-lived
+      # WebSocket, so the idle timeout must be raised group-wide or every paired device's tunnel
+      # drops roughly once a minute. This is exactly why the dashboard is its own ALB group rather
+      # than joining currentai-public: this annotation is load-balancer-scoped and would otherwise
+      # affect the ALB serving agent-service/router traffic too.
+      alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=3600
+    paths:
+      - path: /api/v1
+        pathType: Prefix
+        targetService:
+          name: pangolin
+          port: 3000
+      - path: /
+        pathType: Prefix
+        targetService:
+          name: pangolin
+          port: 3002
 
   - enabled: true
-    name: open-webui-ingress
-    namespace: experiment
+    name: pangolin-api-ingress # Integration API -- this is PANGOLIN_API_URL, what Vercel calls
+    namespace: currentai-pangolin
     ingressClassName: alb
-    host: potluckchat.{{ .Values.domain }}
+    host: pangolin-api.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/dacfb9b4-402c-4cf7-b2a9-09985ab37024"
       alb.ingress.kubernetes.io/group.name: currentai-public
     targetService:
-      name: open-webui
-      port: 80
+      name: pangolin
+      port: 3003
+
+  - enabled: true
+    name: pangolin-tunnel-apex-ingress # apex tunnel domain
+    namespace: currentai-pangolin
+    ingressClassName: alb
+    host: "tunnel.{{ .Values.domain }}"
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/8c28d34b-7df1-4f0a-a23f-863825f01d8b"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    targetService:
+      name: pangolin-traefik
+      port: 443
+
+  - enabled: true
+    name: pangolin-tunnel-ingress # per-device resources
+    namespace: currentai-pangolin
+    ingressClassName: alb
+    host: "*.tunnel.{{ .Values.domain }}"
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/1d3d07d6-f742-4ed9-9a5d-8f56c0f4ea54"
+      alb.ingress.kubernetes.io/group.name: currentai-public
+      # Load-bearing, not incidental: Pangolin forces ssl:true on every public resource server-side
+      # (confirmed by reading createResource.ts during CUR-1266's local build), so Traefik redirects
+      # HTTP->HTTPS for every per-device hostname. Forwarding plain HTTP here would create a redirect
+      # loop against the ALB's own ssl-redirect -- this exact failure was hit for real in local
+      # testing (see pangolin/README.md in the main aipotluck.org repo). The ALB does not verify the
+      # backend cert, so Traefik's own default self-signed cert is fine on this leg.
+      alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    targetService:
+      name: pangolin-traefik
+      port: 443
+
 
