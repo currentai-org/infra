@@ -6,6 +6,12 @@ models:
     api_key: os.environ/MISTRAL_API_KEY
   model_info:
     access_groups: ["public", "private"]
-
+- model_name: mistralai/mistral-large-2610
+  litellm_params:
+    model: openai/mistralai/mistral-large-4-0
+    api_base: https://openrouter.ai/api/v1`
+    api_key: os.environ/OPENROUTER_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
 fallbacks:
   - mistralai/mistral-large-3-fallback
