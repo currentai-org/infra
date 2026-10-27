@@ -14,5 +14,5 @@ models:
   model_info:
     access_groups: ["public", "private"]
 
-fallbacks:
-  - mistralai/mistral-large-3-fallback
+#fallbacks:
+#  - mistralai/mistral-large-3-fallback
