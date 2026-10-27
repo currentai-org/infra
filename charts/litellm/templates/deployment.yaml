@@ -235,6 +235,12 @@ spec:
                   name: {{ .Values.secrets.name }}
                   key: scaleway_api_key
                   optional: true
+            - name: CURRENTAI_CLOUD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.name }}
+                  key: currentai_cloud
+                  optional: true
 
 
 
