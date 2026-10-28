@@ -23,10 +23,10 @@ models:
     api_key: os.environ/PHOENIQS_API_KEY
   model_info:
     access_groups: ["public", "private"]
-- model_name: swiss-ai/apertus-v1.5-70b
-  litellm_params:
-    model: openai/swiss-ai/Apertus-v1.5-70B
-    api_base: https://api.apertus.currentai.cloud/v1
-    api_key: os.environ/CURRENTAI_CLOUD
-  model_info:
-    access_groups: ["public", "private"]
+#- model_name: swiss-ai/apertus-v1.5-70b
+#  litellm_params:
+#    model: openai/swiss-ai/Apertus-v1.5-70B
+#    api_base: https://api.apertus.currentai.cloud/v1
+#    api_key: os.environ/CURRENTAI_CLOUD
+#  model_info:
+#    access_groups: ["public", "private"]
