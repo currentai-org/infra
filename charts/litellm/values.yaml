@@ -44,16 +44,20 @@ app:
       memory: 4Gi
       cpu: 1000m
 
-initMigration:
-  resources:
-    requests:
-      memory: 512Mi
-      cpu: 100m
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-
   affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                  - m5a.large
+                  - m6a.large
+                  - m7a.large
+                  - c5a.xlarge
+                  - c6a.xlarge
+                  - c7a.xlarge
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
@@ -83,6 +87,15 @@ initMigration:
           app: litellm
   nodeSelector: {}
   tolerations: []
+initMigration:
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 2Gi
+      cpu: 1000m
+
 service:
   name: litellm-service
   type: ClusterIP

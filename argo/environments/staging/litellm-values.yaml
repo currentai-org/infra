@@ -29,3 +29,11 @@ config:
   litellm_settings:
     cache_params:
       namespace: litellm_cai.caching
+
+app:
+  livenessProbe:
+    failureThreshold: 6
+    timeoutSeconds: 10
+  readinessProbe:
+    failureThreshold: 6
+    timeoutSeconds: 10
