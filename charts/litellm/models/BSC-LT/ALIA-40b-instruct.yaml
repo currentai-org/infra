@@ -9,7 +9,7 @@ models:
 - model_name: BSC-LT/ALIA-40b-instruct
   litellm_params:
     model: openai/BSC-LT/ALIA-40b-instruct
-    api_base: https://api.alia.currentai.cloud/v1
+    api_base: https://api.alia2.currentai.cloud/v1
     api_key: os.environ/CURRENTAI_CLOUD
   model_info:
     access_groups: ["public", "private"]

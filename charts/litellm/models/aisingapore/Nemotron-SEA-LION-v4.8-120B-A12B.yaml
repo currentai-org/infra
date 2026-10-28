@@ -9,7 +9,7 @@ models:
 - model_name: aisingapore/Nemotron-SEA-LION-v4.8-120B-A12B
   litellm_params:
     model: openai/aisingapore/Nemotron-SEA-LION-v4.8-120B
-    api_base: https://api.nemotron.currentai.cloud/v1
+    api_base: https://api.nemotron2.currentai.cloud/v1
     api_key: os.environ/CURRENTAI_CLOUD
   model_info:
     access_groups: ["public", "private"]
