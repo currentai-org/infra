@@ -1,0 +1,6 @@
+apiVersion: v2
+name: agent-service
+description: Public AI's sovereign agent API — model-boundary proxy (Plane A) + bwrap-sandboxed per-task executor (Plane B)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

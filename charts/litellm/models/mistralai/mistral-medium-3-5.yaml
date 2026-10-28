@@ -1,0 +1,22 @@
+models:
+- model_name: mistralai/mistral-medium-3-5
+  litellm_params:
+    model: openai/mistral-medium-3-5
+    api_base: https://api.mistral.ai/v1
+    api_key: os.environ/MISTRAL_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
+- model_name: mistralai/mistral-medium-3-5
+  litellm_params:
+    model: openai/mistral-medium-3.5-128b
+    api_base: https://api.scaleway.ai/b38146d1-9068-4e88-b3d2-8189ccb794b1/v1
+    api_key: os.environ/SCALEWAY_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
+- model_name: mistralai/mistral-medium-3-5
+  litellm_params:
+    model: openai/mistralai/mistral-medium-3-5
+    api_base: https://openrouter.ai/api/v1
+    api_key: os.environ/OPENROUTER_API_KEY
+  model_info:
+    access_groups: ["public", "private"]
