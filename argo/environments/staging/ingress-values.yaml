@@ -121,4 +121,37 @@ ingresses:
       name: pangolin-traefik
       port: 443
 
+  - enabled: true
+    name: grafana-ingress
+    namespace: monitoring
+    ingressClassName: alb
+    host: grafana.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-admin
+    targetService:
+      name: grafana
+      port: 80
+
+  - enabled: true
+    name: prometheus-ingress
+    namespace: monitoring
+    ingressClassName: alb
+    host: prometheus.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-admin
+    targetService:
+      name: prometheus-server
+      port: 80
+
+
 

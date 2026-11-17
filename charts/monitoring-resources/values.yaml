@@ -1,0 +1,13 @@
+# Default values for monitoring-resources.
+
+prometheus:
+  secretsName: ""
+
+grafana:
+  secretsName: ""
+
+argocdNotifications:
+  enabled: true
+  secretsName: ""
+
+awsRegion: "eu-north-1"
