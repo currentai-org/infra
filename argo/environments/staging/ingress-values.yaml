@@ -24,32 +24,16 @@ ingresses:
     targetService:
       name: agent-service-app
       port: 80
-  - enabled: true
-    name: router-ingress
-    namespace: currentai-router
-    ingressClassName: alb
-    host: router.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-public
-      alb.ingress.kubernetes.io/healthcheck-path: /health/liveliness
-    targetService:
-      name: litellm-service
-      port: 4000
 
   # --- Pangolin (CUR-1266 managed local-inference, charts/pangolin) -------------------------------
   # Split across two ALB groups deliberately -- see charts/pangolin/LOCAL-PATCHES.md "Hostname
   # layout": the dashboard is a full admin UI that can mint tunnels/API keys, so it does not share a
   # load balancer with public traffic. All three entries reference a literal ACM cert ARN rather than
-  # relying on auto-discovery (unlike agent-service/router above) -- the ARN below MUST be filled in
+  # relying on auto-discovery (unlike agent-service above) -- the ARN below MUST be filled in
   # with the real cert covering pangolin.{domain}, pangolin-api.{domain}, and *.tunnel.{domain} before
   # the first sync (see "Prerequisites" in LOCAL-PATCHES.md). Do NOT set the shared certificateArn at
   # the top of this file instead -- that value is shared by every entry above and would repoint
-  # agent-service/router's certs too.
+  # agent-service's certs too.
   - enabled: true
     name: pangolin-dashboard-ingress
     namespace: currentai-pangolin
@@ -67,7 +51,7 @@ ingresses:
       # WebSocket, so the idle timeout must be raised group-wide or every paired device's tunnel
       # drops roughly once a minute. This is exactly why the dashboard is its own ALB group rather
       # than joining currentai-public: this annotation is load-balancer-scoped and would otherwise
-      # affect the ALB serving agent-service/router traffic too.
+      # affect the ALB serving agent-service traffic too.
       alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=3600
     paths:
       - path: /api/v1
