@@ -1,10 +1,24 @@
 domain: currentai.cloud
 
-# Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
-# Please do not add other ingress groups names, they will create new load balancers.
 
 ingresses:
-  - enabled: false
+  - enabled: true
+    name: argo-ingress
+    namespace: argocd
+    ingressClassName: alb
+    host: argo.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: admin
+    targetService:
+      name: argocd-server
+      port: 80
+
+  - enabled: true
     name: grafana-ingress
     namespace: monitoring
     ingressClassName: alb
@@ -15,12 +29,12 @@ ingresses:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-admin
+      alb.ingress.kubernetes.io/group.name: admin
     targetService:
       name: grafana
       port: 80
 
-  - enabled: false
+  - enabled: true
     name: prometheus-ingress
     namespace: monitoring
     ingressClassName: alb
@@ -31,7 +45,7 @@ ingresses:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-admin
+      alb.ingress.kubernetes.io/group.name: admin
     targetService:
       name: prometheus-server
       port: 80
