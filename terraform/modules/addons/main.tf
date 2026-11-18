@@ -10,7 +10,7 @@ resource "helm_release" "argocd" {
   chart           = "argo-cd"
   version         = var.argocd_chart_version
   namespace       = kubernetes_namespace_v1.argocd.metadata[0].name
-  timeout         = 200
+  timeout         = 600
   replace         = true
   cleanup_on_fail = true
 
@@ -56,6 +56,28 @@ resource "helm_release" "argocd" {
             p, holmesgpt, repositories, get, *, allow
             p, holmesgpt, clusters, get, *, allow
           EOT
+        }
+      }
+      repoServer = {
+        resources = {
+          requests = {
+            cpu    = "100m"
+            memory = "256Mi"
+          }
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+        livenessProbe = {
+          timeoutSeconds   = 10
+          periodSeconds    = 15
+          failureThreshold = 5
+        }
+        readinessProbe = {
+          timeoutSeconds   = 5
+          periodSeconds    = 10
+          failureThreshold = 3
         }
       }
       notifications = {
@@ -201,7 +223,7 @@ resource "helm_release" "external_secrets" {
   chart           = "external-secrets"
   version         = var.external_secrets_chart_version
   namespace       = kubernetes_namespace_v1.external_secrets.metadata[0].name
-  timeout         = 200
+  timeout         = 600
   replace         = true
   cleanup_on_fail = true
 

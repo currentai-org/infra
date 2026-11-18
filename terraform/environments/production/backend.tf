@@ -25,10 +25,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "prod-terraform-state-currentai" # Matches terraform-remote-state/0-locals.tf in eu-west-3
+    bucket         = "prod-terraform-state-currentai"
     key            = "env/production/terraform.tfstate"
     region         = "eu-west-3"
-    dynamodb_table = "terraform-state"
+    dynamodb_table = "prod-terraform-state"
     encrypt        = true
   }
 }

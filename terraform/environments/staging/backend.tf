@@ -25,10 +25,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "staging-terraform-state-currentai" # Update to your S3 state bucket in eu-north-1
+    bucket         = "staging-terraform-state-currentai"
     key            = "env/staging/terraform.tfstate"
     region         = "eu-north-1"
-    dynamodb_table = "terraform-state"
+    dynamodb_table = "staging-terraform-state"
     encrypt        = true
   }
 }

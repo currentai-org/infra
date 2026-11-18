@@ -18,9 +18,9 @@ terraform/
 
 ## Prerequisites
 
-1. **Remote State S3 Bucket & DynamoDB Lock Table** (one per environment/region):
-   - Staging (`eu-north-1`): bucket `staging-terraform-state-currentai`, table `terraform-state` (or update `environments/staging/backend.tf`).
-   - Production (`eu-west-3`): bucket `prod-terraform-state-currentai`, table `terraform-state` (or update `environments/production/backend.tf`).
+1. **Remote State S3 Bucket & DynamoDB Lock Table** (one per environment/region, created by `terraform-remote-state/`):
+   - Staging (`eu-north-1`): bucket `staging-terraform-state-currentai`, table `staging-terraform-state`.
+   - Production (`eu-west-3`): bucket `prod-terraform-state-currentai`, table `prod-terraform-state`.
 2. **Doppler-synced AWS Secrets Manager secrets**:
    Before running `terraform plan` / `apply`, ensure Doppler has synced these secrets into the target region's AWS Secrets Manager:
    - `/agent-service`

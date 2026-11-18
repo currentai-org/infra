@@ -28,7 +28,7 @@ scheduledHealthChecks:
   destinations:
     - type: slack
       config:
-        channel: "#cluster-alerts"
+        channel: "#cai-infra-alerts"
   items:
     - name: periodic-cluster-health-audit
       namespace: cluster-agent
@@ -69,7 +69,7 @@ triggeredHealthChecks:
   destinations:
     - type: slack
       config:
-        channel: "#cluster-alerts"
+        channel: "#cai-infra-alerts"
   defaultQuery: |
     Deployment {{ .deployment }} in namespace {{ .namespace }} was rolled out to {{ .new.image }} (was {{ .old.image }}).
     Evaluate whether the deployment is currently healthy:

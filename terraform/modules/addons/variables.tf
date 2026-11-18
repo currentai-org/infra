@@ -1,7 +1,7 @@
 variable "alert_email" {
   type        = string
   description = "From/alert email address for Argo CD notifications"
-  default     = "sean@publicai.co"
+  default     = "sean+infra@currentai.org"
 }
 
 variable "smtp_host" {

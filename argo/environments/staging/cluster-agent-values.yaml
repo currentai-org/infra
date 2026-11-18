@@ -25,7 +25,7 @@ scheduledHealthChecks:
   destinations:
     - type: slack
       config:
-        channel: "#stg-cluster-alerts"
+        channel: "#cai-stg-infra-alerts"
   items:
     - name: periodic-cluster-health-audit
       namespace: cluster-agent
@@ -58,7 +58,7 @@ triggeredHealthChecks:
   destinations:
     - type: slack
       config:
-        channel: "#stg-cluster-alerts"
+        channel: "#cai-stg-infra-alerts"
 
 holmes:
   enabled: true
