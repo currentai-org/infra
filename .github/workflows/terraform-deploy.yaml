@@ -1,0 +1,67 @@
+name: Deploy Terraform
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    concurrency:
+      group: terraform-${{ matrix.environment }}
+      cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment: staging
+            working-directory: terraform/environments/staging
+            region: eu-north-1
+            cluster-name: staging-cluster
+            bootstrap-file: argo/bootstrap/staging-bootstrap.yaml
+          - environment: production
+            working-directory: terraform/environments/production
+            region: eu-west-3
+            cluster-name: prod-cluster
+            bootstrap-file: argo/bootstrap/production-bootstrap.yaml
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.working-directory }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ matrix.region }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --region ${{ matrix.region }} --name ${{ matrix.cluster-name }}
+
+      - name: Apply ArgoCD Root App
+        working-directory: .
+        run: kubectl apply -f ${{ matrix.bootstrap-file }}

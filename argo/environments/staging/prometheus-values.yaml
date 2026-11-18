@@ -1,0 +1,35 @@
+# Staging overrides for standalone Prometheus community chart
+alertmanager:
+  enabled: false
+
+pushgateway:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: false
+
+nodeExporter:
+  enabled: false
+
+server:
+  enableConfigReloader: false
+  tcpSocketProbeEnabled: true
+  persistentVolume:
+    enabled: true
+    size: 10Gi
+    storageClass: "ebs-sc"
+  extraFlags:
+    - "web.config.file=/etc/prometheus/web.config"
+    - "storage.tsdb.retention.size=5GB"
+  extraVolumes:
+    - name: web-config
+      secret:
+        secretName: prometheus-web-config
+  extraVolumeMounts:
+    - name: web-config
+      mountPath: /etc/prometheus
+      readOnly: true
+
+configmapReload:
+  prometheus:
+    enabled: false

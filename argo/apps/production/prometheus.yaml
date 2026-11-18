@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: "#cai-infra-alerts"
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: "#cai-infra-alerts"
+    notifications.argoproj.io/subscribe.on-health-degraded.email: "sean+infra@currentai.org"
+    notifications.argoproj.io/subscribe.on-sync-failed.email: "sean+infra@currentai.org"
+    notifications.argoproj.io/subscribe.on-deployed.slack: "#cai-infra-alerts"
+    notifications.argoproj.io/subscribe.on-deployed.email: "sean+infra@currentai.org"
+    notifications.argoproj.io/subscribe.on-created.slack: "#cai-infra-alerts"
+    notifications.argoproj.io/subscribe.on-created.email: "sean+infra@currentai.org"
+    notifications.argoproj.io/subscribe.on-deleted.slack: "#cai-infra-alerts"
+    notifications.argoproj.io/subscribe.on-deleted.email: "sean+infra@currentai.org"
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://prometheus-community.github.io/helm-charts'
+      chart: prometheus
+      targetRevision: 29.17.0
+      helm:
+        valueFiles:
+          - $values/argo/environments/production/prometheus-values.yaml
+    - repoURL: 'https://github.com/currentai-org/infra'
+      targetRevision: main
+      ref: values
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

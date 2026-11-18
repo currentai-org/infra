@@ -1,0 +1,6 @@
+apiVersion: v2
+name: monitoring-resources
+description: Helm chart for ClusterSecretStore and monitoring/ArgoCD ExternalSecrets
+type: application
+version: 1.0.0
+appVersion: "1.0"

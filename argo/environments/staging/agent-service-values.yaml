@@ -1,0 +1,10 @@
+image:
+  repository: 818561370924.dkr.ecr.us-east-1.amazonaws.com/agent-service
+  tag: latest
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: ClusterSecretStore
+  remoteKey: /agent-service

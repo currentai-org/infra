@@ -4,18 +4,35 @@ domain: aipotluck.org
 # Please do not add other ingress groups names, they will create new load balancers.
 
 ingresses:
-  - enabled: true
-    name: simple-pod-ingress
-    namespace: experiment
+  - enabled: false
+    name: grafana-ingress
+    namespace: monitoring
     ingressClassName: alb
-    host: simple-pod.{{ .Values.domain }}
+    host: grafana.{{ .Values.domain }}
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: currentai-public
+      alb.ingress.kubernetes.io/group.name: currentai-admin
     targetService:
-      name: simple-pod-service
+      name: grafana
       port: 80
+
+  - enabled: false
+    name: prometheus-ingress
+    namespace: monitoring
+    ingressClassName: alb
+    host: prometheus.{{ .Values.domain }}
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/group.name: currentai-admin
+    targetService:
+      name: prometheus-server
+      port: 80
+

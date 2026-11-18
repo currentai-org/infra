@@ -1,0 +1,240 @@
+resource "kubernetes_namespace_v1" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+}
+
+resource "helm_release" "argocd" {
+  name            = "argocd"
+  repository      = "https://argoproj.github.io/argo-helm"
+  chart           = "argo-cd"
+  version         = var.argocd_chart_version
+  namespace       = kubernetes_namespace_v1.argocd.metadata[0].name
+  timeout         = 600
+  replace         = true
+  cleanup_on_fail = true
+
+  set = [
+    {
+      name  = "server.service.type"
+      value = "ClusterIP"
+    },
+    {
+      name  = "configs.params.server\\.insecure"
+      value = "true"
+    },
+    {
+      name  = "global.tolerations[0].key"
+      value = "eks.amazonaws.com/compute-type"
+    },
+    {
+      name  = "global.tolerations[0].operator"
+      value = "Equal"
+    },
+    {
+      name  = "global.tolerations[0].value"
+      value = "auto"
+    },
+    {
+      name  = "global.tolerations[0].effect"
+      value = "NoSchedule"
+    }
+  ]
+
+  values = [
+    yamlencode({
+      configs = {
+        cm = {
+          "accounts.holmesgpt" = "apiKey"
+        }
+        rbac = {
+          "policy.csv" = <<-EOT
+            p, holmesgpt, applications, get, *, allow
+            p, holmesgpt, applications, manifests, */*, allow
+            p, holmesgpt, applications, resources, */*, allow
+            p, holmesgpt, projects, get, *, allow
+            p, holmesgpt, repositories, get, *, allow
+            p, holmesgpt, clusters, get, *, allow
+          EOT
+        }
+      }
+      repoServer = {
+        resources = {
+          requests = {
+            cpu    = "100m"
+            memory = "256Mi"
+          }
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+        livenessProbe = {
+          timeoutSeconds   = 10
+          periodSeconds    = 15
+          failureThreshold = 5
+        }
+        readinessProbe = {
+          timeoutSeconds   = 5
+          periodSeconds    = 10
+          failureThreshold = 3
+        }
+      }
+      notifications = {
+        enabled = true
+        secret = {
+          create = false
+        }
+        notifiers = {
+          "service.slack" = "token: $slack-token"
+          "service.email" = <<-EOT
+            host: ${var.smtp_host}
+            port: ${var.smtp_port}
+            from: ${var.alert_email}
+            username: $email-username
+            password: $email-password
+          EOT
+        }
+        triggers = {
+          "trigger.on-deployed"        = <<-EOT
+            - description: Application is synced and healthy.
+              oncePer: app.status.sync.revision
+              send: [app-deployed]
+              when: app.status.operationState != nil and app.status.operationState.phase in ["Succeeded"] and app.status.health.status == "Healthy"
+          EOT
+          "trigger.on-health-degraded" = <<-EOT
+            - description: Application has degraded
+              send: [app-health-degraded]
+              when: app.status.health.status == "Degraded"
+          EOT
+          "trigger.on-sync-failed"     = <<-EOT
+            - description: Application syncing has failed
+              send: [app-sync-failed]
+              when: app.status.operationState != nil and app.status.operationState.phase in ["Error", "Failed"]
+          EOT
+          "trigger.on-created"         = <<-EOT
+            - description: Application is created
+              oncePer: app.metadata.name
+              send: [app-created]
+              when: "true"
+          EOT
+          "trigger.on-deleted"         = <<-EOT
+            - description: Application is deleted
+              oncePer: app.metadata.name
+              send: [app-deleted]
+              when: app.metadata.deletionTimestamp != nil
+          EOT
+        }
+        templates = {
+          "template.app-deployed"        = <<-EOT
+            email:
+              subject: Application {{.app.metadata.name}} is deployed and healthy
+            message: |
+              Application {{.app.metadata.name}} is now running revision {{.app.status.sync.revision}}.
+            slack:
+              attachments: |
+                [{
+                  "title": "{{ .app.metadata.name}}",
+                  "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "color": "#18be52",
+                  "fields": [
+                    {"title": "Sync Status", "value": "{{.app.status.sync.status}}", "short": true},
+                    {"title": "Health Status", "value": "{{.app.status.health.status}}", "short": true}
+                  ]
+                }]
+          EOT
+          "template.app-health-degraded" = <<-EOT
+            email:
+              subject: Application {{.app.metadata.name}} has degraded
+            message: |
+              Application {{.app.metadata.name}} health status has degraded to {{.app.status.health.status}}.
+            slack:
+              attachments: |
+                [{
+                  "title": "ALERT: {{ .app.metadata.name}} degraded",
+                  "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "color": "#E96D76",
+                  "fields": [
+                    {"title": "Health Status", "value": "{{.app.status.health.status}}", "short": true}
+                  ]
+                }]
+          EOT
+          "template.app-sync-failed"     = <<-EOT
+            email:
+              subject: Failed to sync application {{.app.metadata.name}}
+            message: |
+              The sync operation of application {{.app.metadata.name}} failed with error: {{.app.status.operationState.message}}
+            slack:
+              attachments: |
+                [{
+                  "title": "ALERT: {{ .app.metadata.name}} sync failed",
+                  "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "color": "#E96D76",
+                  "fields": [
+                    {"title": "Sync Status", "value": "{{.app.status.operationState.phase}}", "short": true}
+                  ]
+                }]
+          EOT
+          "template.app-created"         = <<-EOT
+            email:
+              subject: Application {{.app.metadata.name}} has been created
+            message: |
+              Application {{.app.metadata.name}} has been created.
+            slack:
+              attachments: |
+                [{
+                  "title": "{{ .app.metadata.name}} created",
+                  "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "color": "#18be52",
+                  "fields": [
+                    {"title": "Sync Status", "value": "{{.app.status.sync.status}}", "short": true},
+                    {"title": "Health Status", "value": "{{.app.status.health.status}}", "short": true}
+                  ]
+                }]
+          EOT
+          "template.app-deleted"         = <<-EOT
+            email:
+              subject: Application {{.app.metadata.name}} has been deleted
+            message: |
+              Application {{.app.metadata.name}} has been deleted.
+            slack:
+              attachments: |
+                [{
+                  "title": "ALERT: {{ .app.metadata.name}} deleted",
+                  "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "color": "#E96D76"
+                }]
+          EOT
+        }
+      }
+    })
+  ]
+}
+
+resource "kubernetes_namespace_v1" "external_secrets" {
+  metadata {
+    name = "external-secrets"
+  }
+}
+
+resource "helm_release" "external_secrets" {
+  name            = "external-secrets"
+  repository      = "https://charts.external-secrets.io"
+  chart           = "external-secrets"
+  version         = var.external_secrets_chart_version
+  namespace       = kubernetes_namespace_v1.external_secrets.metadata[0].name
+  timeout         = 600
+  replace         = true
+  cleanup_on_fail = true
+
+  set = [
+    {
+      name  = "installCRDs"
+      value = "true"
+    },
+    {
+      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = var.external_secrets_irsa_role_arn
+    }
+  ]
+}
