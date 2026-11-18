@@ -25,7 +25,7 @@ spec:
         valueFiles:
           - $values/argo/environments/staging/prometheus-values.yaml
     - repoURL: 'https://github.com/currentai-org/infra'
-      targetRevision: dev
+      targetRevision: stg
       ref: values
   destination:
     server: 'https://kubernetes.default.svc'

@@ -18,7 +18,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/currentai-org/infra'
-    targetRevision: dev
+    targetRevision: stg
     path: charts/pangolin
     helm:
       releaseName: pangolin
