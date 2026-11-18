@@ -6,7 +6,7 @@ global:
 secrets:
   enabled: true
   name: "holmes-openrouter"
-  manualSecretsName: "/cluster-agent"
+  manualSecretsName: "prd/cluster-agent"
   property: "OPENROUTER_API_KEY"
   argocdTokenProperty: "ARGOCD_AUTH_TOKEN"
   grafanaApiKeyProperty: "GRAFANA_API_KEY"

@@ -7,4 +7,4 @@ externalSecret:
   secretStoreRef:
     name: aws-secretsmanager
     kind: ClusterSecretStore
-  remoteKey: /agent-service
+  remoteKey: stg/agent-service

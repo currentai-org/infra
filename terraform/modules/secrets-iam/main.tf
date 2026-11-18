@@ -136,17 +136,16 @@ resource "aws_secretsmanager_secret_version" "argocd_notifications" {
 }
 
 # --- 6. Data sources for existing Doppler-managed Secrets Manager secrets ---
-# Data source for existing Agent Service secret
 data "aws_secretsmanager_secret" "agent_service" {
-  name = "/agent-service"
-}
-
-data "aws_secretsmanager_secret" "router_aipotluck_org" {
-  name = "/router-aipotluck-org"
+  name = var.agent_service_secret_name
 }
 
 data "aws_secretsmanager_secret" "pangolin" {
-  name = "/pangolin"
+  name = var.pangolin_secret_name
+}
+
+data "aws_secretsmanager_secret" "cluster_agent" {
+  name = var.cluster_agent_secret_name
 }
 
 # --- 7. IAM Role & Policy for External Secrets Operator (IRSA) ---
@@ -198,9 +197,8 @@ resource "aws_iam_policy" "external_secrets_secretsmanager_access" {
           aws_secretsmanager_secret.prometheus.arn,
           aws_secretsmanager_secret.argocd_notifications.arn,
           data.aws_secretsmanager_secret.agent_service.arn,
-          data.aws_secretsmanager_secret.router_aipotluck_org.arn,
           data.aws_secretsmanager_secret.pangolin.arn,
-          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:*cluster-agent*"
+          data.aws_secretsmanager_secret.cluster_agent.arn
         ]
       }
     ]

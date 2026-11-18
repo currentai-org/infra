@@ -23,9 +23,8 @@ terraform/
    - Production (`eu-west-3`): bucket `prod-terraform-state-currentai`, table `prod-terraform-state`.
 2. **Doppler-synced AWS Secrets Manager secrets**:
    Before running `terraform plan` / `apply`, ensure Doppler has synced these secrets into the target region's AWS Secrets Manager:
-   - `/agent-service`
-   - `/router-aipotluck-org`
-   - `/pangolin`
+   - Staging (`eu-north-1`): `stg/agent-service`, `stg/cluster-agent`, `stg/pangolin`
+   - Production (`eu-west-3`): `prd/agent-service`, `prd/cluster-agent`, `/prd/pangolin`
 
 ## Usage
 

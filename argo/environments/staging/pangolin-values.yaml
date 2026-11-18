@@ -15,7 +15,7 @@
 #
 # Prerequisites this overlay assumes already exist (see charts/pangolin/LOCAL-PATCHES.md "Rollout
 # order" for the full checklist): an ACM cert covering all three HTTP(S) hostnames, an AWS Secrets
-# Manager secret at /pangolin containing SERVER_SECRET, and a default StorageClass for the CNPG +
+# Manager secret at stg/pangolin containing SERVER_SECRET, and a default StorageClass for the CNPG +
 # gerbil PVCs.
 
 deployment:
@@ -53,11 +53,11 @@ database:
 currentai:
   serverSecretExternalSecret:
     enabled: true
-    remoteKey: /pangolin
+    remoteKey: stg/pangolin
   databaseExternalSecret:
     enabled: true
-    managedSecretsName: staging/aichat/open-webui/managed-secrets
-    dbPasswordArn: staging/aichat/database/password
+    managedSecretsName: staging/currentai/database/managed-secrets
+    dbPasswordArn: staging/currentai/database/password
     databaseName: pangolin
     sslMode: no-verify
     extraParams: "keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=3"

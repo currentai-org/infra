@@ -57,3 +57,18 @@ variable "enable_holmes_mcp_iam" {
   description = "Whether to create the IRSA role for HolmesGPT AWS MCP server"
   default     = true
 }
+
+variable "agent_service_secret_name" {
+  type        = string
+  description = "AWS Secrets Manager secret name for agent-service (synced from Doppler)"
+}
+
+variable "pangolin_secret_name" {
+  type        = string
+  description = "AWS Secrets Manager secret name for pangolin (synced from Doppler)"
+}
+
+variable "cluster_agent_secret_name" {
+  type        = string
+  description = "AWS Secrets Manager secret name for cluster-agent (synced from Doppler)"
+}
