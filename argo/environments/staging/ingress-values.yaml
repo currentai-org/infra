@@ -1,4 +1,5 @@
 domain: stg.currentai.cloud
+certificateArn: "arn:aws:acm:eu-north-1:513370128820:certificate/3f07723a-3df3-4466-8a72-bc52bc188900"
 
 # Please stick to the following ingress group names: currentai-public, currentai-api, currentai-admin
 # Please do not add other ingress groups names, they will create new load balancers.
@@ -44,7 +45,7 @@ ingresses:
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/4550d60e-fcaa-4d5c-b78d-39276afaccf2"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
       alb.ingress.kubernetes.io/group.name: admin
       alb.ingress.kubernetes.io/healthcheck-path: /
       # newt (the tunnel client) dials this same host as its control channel over a long-lived
@@ -75,7 +76,7 @@ ingresses:
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/dacfb9b4-402c-4cf7-b2a9-09985ab37024"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
       alb.ingress.kubernetes.io/group.name: public
     targetService:
       name: pangolin
@@ -91,7 +92,7 @@ ingresses:
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/8c28d34b-7df1-4f0a-a23f-863825f01d8b"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
       alb.ingress.kubernetes.io/group.name: public
       alb.ingress.kubernetes.io/backend-protocol: HTTPS
     targetService:
@@ -108,7 +109,7 @@ ingresses:
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:818561370924:certificate/1d3d07d6-f742-4ed9-9a5d-8f56c0f4ea54"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
       alb.ingress.kubernetes.io/group.name: public
       # Load-bearing, not incidental: Pangolin forces ssl:true on every public resource server-side
       # (confirmed by reading createResource.ts during CUR-1266's local build), so Traefik redirects
