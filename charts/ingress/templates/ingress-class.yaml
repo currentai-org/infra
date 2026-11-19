@@ -1,0 +1,13 @@
+{{- $ic := .Values.ingressClass | default dict -}}
+{{- if dig "create" true $ic }}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: {{ dig "name" "alb" $ic | quote }}
+{{- if dig "isDefault" false $ic }}
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+{{- end }}
+spec:
+  controller: {{ dig "controller" "eks.amazonaws.com/alb" $ic | quote }}
+{{- end }}
