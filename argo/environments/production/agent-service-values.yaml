@@ -1,0 +1,10 @@
+image:
+  tag: v0.2.0
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: ClusterSecretStore
+  remoteKey: prd/agent-service
+

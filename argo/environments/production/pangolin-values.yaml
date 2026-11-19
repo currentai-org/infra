@@ -1,0 +1,140 @@
+# Production values overlay for charts/pangolin (vendored fosrl/helm-charts @ pangolin-0.1.0-alpha.1,
+# patched -- see charts/pangolin/LOCAL-PATCHES.md for what's different from upstream and why).
+#
+# Hostnames (see argo/environments/production/ingress-values.yaml for the Ingress side):
+#   pangolin.currentai.cloud      -> dashboard (alb-admin) + newt's control channel
+#   pangolin-api.currentai.cloud  -> Integration API, what Vercel calls (alb-public)
+#   *.tunnel.currentai.cloud      -> per-device resources, routed through Traefik (alb-public)
+#   vpn.currentai.cloud           -> WireGuard UDP, the gerbil NLB created by this chart (not ALB)
+#
+# Prerequisites: an ACM cert in eu-west-3 covering all HTTP(S) hostnames, an AWS Secrets Manager
+# secret at /prd/pangolin containing SERVER_SECRET, the `pangolin` database created on Aurora RDS,
+# and a default StorageClass (`ebs-sc`) for the gerbil PVC.
+
+deployment:
+  type: standalone # no cluster-wide Traefik/CRDs -- see LOCAL-PATCHES.md B1
+  mode: single # Traefik needs gerbil's network namespace to reach the WireGuard interface -- B3
+
+images:
+  pangolinPostgresql:
+    tag: "postgresql-1.23.0"
+  gerbil:
+    tag: "1.5.2"
+  traefik:
+    tag: "v3.7"
+
+# -----------------------------------------------------------------------------
+# Database: External AWS RDS PostgreSQL (shared RDS instance).
+# Connects to RDS via an ExternalSecret extracting host/password from AWS Secrets Manager.
+# CNPG subcharts are disabled.
+# -----------------------------------------------------------------------------
+cnpg-operator:
+  enabled: false
+
+cnpg-cluster:
+  enabled: false
+
+database:
+  mode: external
+  connection:
+    existingSecretName: pangolin-db-connection
+    existingSecretKey: connectionString
+
+# -----------------------------------------------------------------------------
+# currentai patch block (LOCAL-PATCHES.md)
+# -----------------------------------------------------------------------------
+currentai:
+  serverSecretExternalSecret:
+    enabled: true
+    remoteKey: /prd/pangolin
+  databaseExternalSecret:
+    enabled: true
+    managedSecretsName: prod/currentai/database/managed-secrets
+    dbPasswordArn: prod/currentai/database/password
+    databaseName: pangolin
+    sslMode: no-verify
+    extraParams: "keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=3"
+  gerbilWireguardNlb:
+    enabled: true
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+      service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "TCP"
+      service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "3004"
+
+pangolin:
+  deployment:
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8085"
+      prometheus.io/path: "/metrics"
+
+  secret:
+    # B2: the ExternalSecret above (currentai.serverSecretExternalSecret) creates this Secret name.
+    existingSecretName: pangolin-app
+    existingSecretKey: SERVER_SECRET
+
+  config:
+    app:
+      dashboard_url: "https://pangolin.currentai.cloud"
+
+    domains:
+      domain1:
+        base_domain: "tunnel.currentai.cloud"
+        cert_resolver: "none"
+
+    gerbil:
+      base_endpoint: "vpn.currentai.cloud" # the WireGuard NLB hostname, NOT the dashboard.
+
+    flags:
+      enable_integration_api: true # REQUIRED -- defaults false; this is what makes PANGOLIN_API_URL work
+      enable_acme_cert_sync: false # TLS terminates at AWS ALB; disables the 5s acme.json disk check loop
+
+    postgres:
+      enabled: true
+      pool:
+        max_connections: 10
+        idle_timeout_ms: 30000
+        connection_timeout_ms: 10000
+
+    traefik:
+      cert_resolver: "none"
+
+runtime:
+  dependencyWait:
+    image:
+      repository: postgres
+      tag: 18.3-alpine
+
+gerbil:
+  persistence:
+    annotations:
+      # Protect Gerbil's WireGuard private key PVC from being deleted during ArgoCD automated prune
+      argocd.argoproj.io/sync-options: Prune=false
+      # Prevent Helm from deleting the PVC during release upgrade or chart uninstall
+      helm.sh/resource-policy: keep
+
+traefik:
+  enabled: true
+  service:
+    type: ClusterIP
+  config:
+    pollInterval: 15s
+    dynamicRouters:
+      host: "pangolin.currentai.cloud"
+    letsencryptEmail: "pangolin-admin@currentai.org"
+
+networkPolicy:
+  pangolin:
+    externalIngress:
+      integration: true
+    extraIngress:
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: monitoring
+        ports:
+          - protocol: TCP
+            port: 8085
