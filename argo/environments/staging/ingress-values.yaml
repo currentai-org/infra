@@ -1,5 +1,5 @@
 domain: stg.currentai.cloud
-certificateArn: "arn:aws:acm:eu-north-1:513370128820:certificate/3f07723a-3df3-4466-8a72-bc52bc188900"
+certificateArn: "arn:aws:acm:eu-north-1:513370128820:certificate/48b9eb81-2624-4e96-bd16-81860873119f"
 
 # EKS Auto Mode (eks.amazonaws.com/alb) maps each IngressClass to a shared ALB via IngressClassParams
 # (defined in charts/ingress/values.yaml). Stick to `alb-public` or `alb-admin` for `ingressClassName`
@@ -42,7 +42,7 @@ ingresses:
     annotations:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/healthcheck-path: /
     paths:
       - path: /api/v1
@@ -64,7 +64,7 @@ ingresses:
     annotations:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
     targetService:
       name: pangolin
       port: 3003
@@ -77,7 +77,7 @@ ingresses:
     annotations:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/backend-protocol: HTTPS
     targetService:
       name: pangolin-traefik
@@ -91,7 +91,7 @@ ingresses:
     annotations:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:513370128820:certificate/23185613-4ed7-48fa-a39d-206173b0a25e"
+      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       # Load-bearing, not incidental: Pangolin forces ssl:true on every public resource server-side
       # (confirmed by reading createResource.ts during CUR-1266's local build), so Traefik redirects
       # HTTP->HTTPS for every per-device hostname. Forwarding plain HTTP here would create a redirect

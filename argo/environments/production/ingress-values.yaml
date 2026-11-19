@@ -1,7 +1,7 @@
 domain: currentai.cloud
 # Set `certificateArn` (and optionally `pangolinCertificateArn` if separate) to your issued
 # eu-west-3 ACM certificate ARN(s) before deploying HTTPS listeners.
-certificateArn: ""
+certificateArn: "arn:aws:acm:eu-west-3:513370128820:certificate/63957d81-0f6a-4978-b497-a73ea9afc1f8"
 pangolinCertificateArn: ""
 
 # EKS Auto Mode (eks.amazonaws.com/alb) maps each IngressClass to a shared ALB via IngressClassParams
