@@ -1,11 +1,2 @@
-prometheus:
-  secretsName: "prod/currentai/prometheus/secrets"
-
-grafana:
-  secretsName: "prod/currentai/grafana/secrets"
-
-argocdNotifications:
-  enabled: true
-  secretsName: "prod/currentai/argocd/notifications"
-
 awsRegion: "eu-west-3"
+infraSecretsName: "prd/cai-infra"

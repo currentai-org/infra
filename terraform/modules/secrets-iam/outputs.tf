@@ -18,17 +18,7 @@ output "infra_managed_secret_arn" {
   value       = aws_secretsmanager_secret.infra_managed.arn
 }
 
-output "grafana_secret_name" {
-  description = "Name of the Grafana admin credentials secret"
-  value       = aws_secretsmanager_secret.grafana.name
-}
-
-output "prometheus_secret_name" {
-  description = "Name of the Prometheus basic auth credentials secret"
-  value       = aws_secretsmanager_secret.prometheus.name
-}
-
-output "argocd_notifications_secret_name" {
-  description = "Name of the Argo CD notifications secret"
-  value       = aws_secretsmanager_secret.argocd_notifications.name
+output "infra_secret_name" {
+  description = "Name of the shared Doppler-synced infra secret"
+  value       = data.aws_secretsmanager_secret.infra.name
 }

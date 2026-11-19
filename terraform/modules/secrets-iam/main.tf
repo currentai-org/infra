@@ -4,17 +4,6 @@ locals {
   oidc_issuer_host = replace(var.oidc_provider_url, "https://", "")
 }
 
-# --- Auto-generated passwords for monitoring ---
-resource "random_password" "grafana_admin" {
-  length  = 24
-  special = false
-}
-
-resource "random_password" "prometheus_admin" {
-  length  = 24
-  special = false
-}
-
 # --- 1. RDS Master Password Secret ---
 resource "aws_secretsmanager_secret" "rds_password" {
   name                    = "${var.env}/${var.org}/database/password"
@@ -62,80 +51,7 @@ resource "aws_secretsmanager_secret_version" "infra_managed" {
   ))
 }
 
-# --- 3. Grafana Admin Credentials (auto-generated) ---
-resource "aws_secretsmanager_secret" "grafana" {
-  name                    = "${var.env}/${var.org}/grafana/secrets"
-  description             = "Grafana admin credentials (${var.env})"
-  recovery_window_in_days = contains(["prod", "production"], var.env) ? 7 : 0
-
-  tags = {
-    Name        = "${var.env}-${var.org}-grafana-secrets"
-    Environment = var.env
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "grafana" {
-  secret_id = aws_secretsmanager_secret.grafana.id
-  secret_string = jsonencode({
-    admin-user     = "admin"
-    admin-password = random_password.grafana_admin.result
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
-# --- 4. Prometheus Basic-Auth Credentials (auto-generated) ---
-resource "aws_secretsmanager_secret" "prometheus" {
-  name                    = "${var.env}/${var.org}/prometheus/secrets"
-  description             = "Prometheus basic auth credentials (${var.env})"
-  recovery_window_in_days = contains(["prod", "production"], var.env) ? 7 : 0
-
-  tags = {
-    Name        = "${var.env}-${var.org}-prometheus-secrets"
-    Environment = var.env
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "prometheus" {
-  secret_id = aws_secretsmanager_secret.prometheus.id
-  secret_string = jsonencode({
-    admin-user     = "admin"
-    admin-password = random_password.prometheus_admin.result
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
-# --- 5. Argo CD Notifications Secret (populated manually or via Doppler) ---
-resource "aws_secretsmanager_secret" "argocd_notifications" {
-  name                    = "${var.env}/${var.org}/argocd/notifications"
-  description             = "Secrets for ArgoCD notifications (Slack token / SMTP credentials)"
-  recovery_window_in_days = contains(["prod", "production"], var.env) ? 7 : 0
-
-  tags = {
-    Name        = "${var.env}-${var.org}-argocd-notifications"
-    Environment = var.env
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "argocd_notifications" {
-  secret_id = aws_secretsmanager_secret.argocd_notifications.id
-  secret_string = jsonencode({
-    slack-token    = "placeholder-replace-in-console"
-    email-username = "placeholder-replace-in-console"
-    email-password = "placeholder-replace-in-console"
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
-# --- 6. Data sources for existing Doppler-managed Secrets Manager secrets ---
+# --- 3. Data sources for existing Doppler-managed Secrets Manager secrets ---
 data "aws_secretsmanager_secret" "agent_service" {
   name = var.agent_service_secret_name
 }
@@ -148,7 +64,11 @@ data "aws_secretsmanager_secret" "cluster_agent" {
   name = var.cluster_agent_secret_name
 }
 
-# --- 7. IAM Role & Policy for External Secrets Operator (IRSA) ---
+data "aws_secretsmanager_secret" "infra" {
+  name = var.infra_secret_name
+}
+
+# --- 4. IAM Role & Policy for External Secrets Operator (IRSA) ---
 resource "aws_iam_role" "external_secrets_irsa" {
   name = "${var.env}-ExternalSecrets-IRSA-Role"
 
@@ -193,12 +113,10 @@ resource "aws_iam_policy" "external_secrets_secretsmanager_access" {
         Resource = [
           aws_secretsmanager_secret.rds_password.arn,
           aws_secretsmanager_secret.infra_managed.arn,
-          aws_secretsmanager_secret.grafana.arn,
-          aws_secretsmanager_secret.prometheus.arn,
-          aws_secretsmanager_secret.argocd_notifications.arn,
           data.aws_secretsmanager_secret.agent_service.arn,
           data.aws_secretsmanager_secret.pangolin.arn,
-          data.aws_secretsmanager_secret.cluster_agent.arn
+          data.aws_secretsmanager_secret.cluster_agent.arn,
+          data.aws_secretsmanager_secret.infra.arn
         ]
       }
     ]

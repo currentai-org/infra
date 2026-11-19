@@ -1,13 +1,27 @@
 # Default values for monitoring-resources.
 
+awsRegion: "eu-north-1"
+infraSecretsName: ""
+
 prometheus:
   secretsName: ""
+  userProperty: "PROMETHEUS_ADMIN_USER"
+  passwordProperty: "PROMETHEUS_ADMIN_PASSWORD"
 
 grafana:
   secretsName: ""
+  userProperty: "GRAFANA_ADMIN_USER"
+  passwordProperty: "GRAFANA_ADMIN_PASSWORD"
+
+argocd:
+  enabled: true
+  secretsName: ""
+  passwordProperty: "ARGOCD_ADMIN_PASSWORD"
+  passwordMtime: "2026-01-01T00:00:00Z"
 
 argocdNotifications:
   enabled: true
   secretsName: ""
-
-awsRegion: "eu-north-1"
+  slackTokenProperty: "ARGOCD_NOTIFICATIONS_SLACK_TOKEN"
+  emailUsernameProperty: "ARGOCD_NOTIFICATIONS_EMAIL_USERNAME"
+  emailPasswordProperty: "ARGOCD_NOTIFICATIONS_EMAIL_PASSWORD"

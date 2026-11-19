@@ -72,3 +72,8 @@ variable "cluster_agent_secret_name" {
   type        = string
   description = "AWS Secrets Manager secret name for cluster-agent (synced from Doppler)"
 }
+
+variable "infra_secret_name" {
+  type        = string
+  description = "AWS Secrets Manager secret name for shared infra secrets (Grafana, Prometheus, Argo CD admin and notifications, synced from Doppler)"
+}

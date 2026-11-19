@@ -72,6 +72,7 @@ module "secrets_iam" {
   agent_service_secret_name = "stg/agent-service"
   pangolin_secret_name      = "stg/pangolin"
   cluster_agent_secret_name = "stg/cluster-agent"
+  infra_secret_name         = "stg/cai-infra"
 }
 
 module "addons" {

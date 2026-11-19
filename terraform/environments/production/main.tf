@@ -72,6 +72,7 @@ module "secrets_iam" {
   agent_service_secret_name = "prd/agent-service"
   pangolin_secret_name      = "/prd/pangolin"
   cluster_agent_secret_name = "prd/cluster-agent"
+  infra_secret_name         = "prd/cai-infra"
 }
 
 module "addons" {
