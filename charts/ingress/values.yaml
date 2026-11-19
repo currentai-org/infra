@@ -7,6 +7,12 @@
 domain: currentai.org
 certificateArn: ""
 
+ingressClass:
+  create: true
+  name: alb
+  controller: eks.amazonaws.com/alb
+  isDefault: true
+
 ingresses:
   - enabled: true
     name: example-user-application-ingress
