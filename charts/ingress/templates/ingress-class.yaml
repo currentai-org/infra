@@ -1,13 +1,28 @@
-{{- $ic := .Values.ingressClass | default dict -}}
-{{- if dig "create" true $ic }}
+{{- range .Values.ingressClasses }}
+{{- if .params }}
+---
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: {{ .name | quote }}
+spec:
+  {{- toYaml .params | nindent 2 }}
+{{- end }}
+---
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-  name: {{ dig "name" "alb" $ic | quote }}
-{{- if dig "isDefault" false $ic }}
+  name: {{ .name | quote }}
+  {{- if .isDefault }}
   annotations:
     ingressclass.kubernetes.io/is-default-class: "true"
-{{- end }}
+  {{- end }}
 spec:
-  controller: {{ dig "controller" "eks.amazonaws.com/alb" $ic | quote }}
+  controller: {{ .controller | default "eks.amazonaws.com/alb" | quote }}
+  {{- if .params }}
+  parameters:
+    apiGroup: eks.amazonaws.com
+    kind: IngressClassParams
+    name: {{ .name | quote }}
+  {{- end }}
 {{- end }}

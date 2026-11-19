@@ -1,19 +1,20 @@
 domain: currentai.cloud
+# Set `certificateArn` to your eu-west-3 ACM certificate ARN before deploying HTTPS listeners.
+certificateArn: ""
 
+# EKS Auto Mode (eks.amazonaws.com/alb) maps each IngressClass to a shared ALB via IngressClassParams
+# (defined in charts/ingress/values.yaml). Stick to `alb-public` or `alb-admin` for `ingressClassName`.
 
 ingresses:
   - enabled: true
     name: argo-ingress
     namespace: argocd
-    ingressClassName: alb
+    ingressClassName: alb-admin
     host: argo.{{ .Values.domain }}
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin
     targetService:
       name: argocd-server
       port: 80
@@ -21,15 +22,12 @@ ingresses:
   - enabled: true
     name: grafana-ingress
     namespace: monitoring
-    ingressClassName: alb
+    ingressClassName: alb-admin
     host: grafana.{{ .Values.domain }}
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin
     targetService:
       name: grafana
       port: 80
@@ -37,16 +35,12 @@ ingresses:
   - enabled: true
     name: prometheus-ingress
     namespace: monitoring
-    ingressClassName: alb
+    ingressClassName: alb-admin
     host: prometheus.{{ .Values.domain }}
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin
     targetService:
       name: prometheus-server
       port: 80
-

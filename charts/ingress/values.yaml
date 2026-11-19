@@ -1,66 +1,58 @@
 # Ingress configuration for web services
-# Note: This values.yaml is only an EXAMPLE.
-# These values are completely overwritten by the environment-specific values in:
-#   - Staging: argo/environments/staging/ingress-values.yaml
+# Note: These example ingresses are overwritten by the environment-specific values in:
+#   - Staging:    argo/environments/staging/ingress-values.yaml
 #   - Production: argo/environments/production/ingress-values.yaml
 
 domain: currentai.org
 certificateArn: ""
 
-ingressClass:
-  create: true
-  name: alb
-  controller: eks.amazonaws.com/alb
-  isDefault: true
+# EKS Auto Mode (eks.amazonaws.com/alb) creates one shared ALB per IngressClassParams group.
+# ALB-wide settings (scheme, targetType, group.name, loadBalancerAttributes) live here rather
+# than as per-Ingress annotations — pick `alb-public` or `alb-admin` via `ingressClassName`.
+ingressClasses:
+  - name: alb-public
+    controller: eks.amazonaws.com/alb
+    isDefault: true
+    params:
+      scheme: internet-facing
+      targetType: ip
+      group:
+        name: public
+  - name: alb-admin
+    controller: eks.amazonaws.com/alb
+    isDefault: false
+    params:
+      scheme: internet-facing
+      targetType: ip
+      group:
+        name: admin
+      loadBalancerAttributes:
+        - key: idle_timeout.timeout_seconds
+          value: "3600"
 
 ingresses:
   - enabled: true
     name: example-user-application-ingress
     namespace: example-namespace
-    ingressClassName: alb
+    ingressClassName: alb-public
     host: user-app.{{ .Values.domain }}
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: public-group
     targetService:
       name: user-application-service
       port: 8080
 
   - enabled: true
-    name: example-api-service-ingress
-    namespace: example-namespace
-    ingressClassName: alb
-    host: api-service.{{ .Values.domain }}
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: "443"
-      alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: api-group
-    targetService:
-      name: api-service
-      port: 4000
-
-  - enabled: true
     name: example-admin-application-ingress
     namespace: example-namespace
-    ingressClassName: alb
+    ingressClassName: alb-admin
     host: admin-app.{{ .Values.domain }}
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
-      alb.ingress.kubernetes.io/group.name: admin-group
     targetService:
       name: admin-application-service
       port: 80
-
-# Certificate ARN (passed from command line)
-certificateArn: ""
