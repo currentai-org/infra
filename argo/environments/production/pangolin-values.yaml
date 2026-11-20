@@ -103,6 +103,10 @@ pangolin:
       cert_resolver: "none"
 
 runtime:
+  updateStrategy:
+    # Single-pod mode mounts the RWO EBS PVC (pangolin-gerbil-config); RollingUpdate deadlocks
+    # across nodes on multi-attach.
+    type: Recreate
   dependencyWait:
     image:
       repository: postgres

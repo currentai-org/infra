@@ -39,7 +39,11 @@ spec:
   {{- end }}
   {{- with $root.Values.runtime.updateStrategy }}
   strategy:
+    {{- if eq (.type | default "RollingUpdate") "Recreate" }}
+    type: Recreate
+    {{- else }}
     {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
   template:
     metadata:
