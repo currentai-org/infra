@@ -31,7 +31,7 @@ images:
     tag: "v3.7"
 
 # -----------------------------------------------------------------------------
-# Database: External AWS RDS PostgreSQL (same shared RDS instance as LiteLLM).
+# Database: External AWS RDS PostgreSQL (shared RDS instance).
 # Connects to RDS via an ExternalSecret extracting host/password from AWS Secrets Manager.
 # CNPG subcharts are disabled.
 # -----------------------------------------------------------------------------
