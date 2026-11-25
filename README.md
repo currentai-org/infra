@@ -20,10 +20,6 @@ All changes pushed to this repository are automatically deployed to their respec
 * Create a separate **Ingress** resource for each new application.
 * All applications share a single common **Load Balancer**.
 
-## Monitoring Status
-
-To view the deployment status and sync states, visit:
-👉 **[argo.ai-staging.chat](https://argo.ai-staging.chat)**
 
 ## Git Workflow
 
