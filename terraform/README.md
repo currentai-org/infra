@@ -9,7 +9,7 @@ terraform/
 │   ├── eks/          # EKS Auto Mode cluster, OIDC, Pod Identity, ALB Controller role
 │   ├── rds/          # KMS-encrypted Aurora PostgreSQL Serverless v2 cluster
 │   ├── redis/        # ElastiCache Serverless Valkey (and optional non-cluster Redis)
-│   ├── secrets-iam/  # Auto-generated repo secrets, Doppler data sources, ESO & Holmes IRSA
+│   ├── secrets-iam/  # Auto-generated repo secrets, Doppler data sources, & ESO IRSA
 │   └── addons/       # Argo CD + External Secrets Operator Helm releases
 └── environments/
     ├── staging/      # eu-north-1, single NAT GW, 1 RDS instance, deletion_protection = false
@@ -23,8 +23,8 @@ terraform/
    - Production (`eu-west-3`): bucket `prod-terraform-state-currentai`, table `prod-terraform-state`.
 2. **Doppler-synced AWS Secrets Manager secrets**:
    Before running `terraform plan` / `apply`, ensure Doppler has synced these secrets into the target region's AWS Secrets Manager:
-   - Staging (`eu-north-1`): `stg/agent-service`, `stg/cluster-agent`, `stg/pangolin`, `stg/cai-infra`
-   - Production (`eu-west-3`): `prd/agent-service`, `prd/cluster-agent`, `/prd/pangolin`, `prd/cai-infra`
+   - Staging (`eu-north-1`): `stg/agent-service`, `stg/pangolin`, `stg/cai-infra`
+   - Production (`eu-west-3`): `prd/agent-service`, `/prd/pangolin`, `prd/cai-infra`
 
 ## Usage
 

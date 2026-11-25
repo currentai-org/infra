@@ -27,8 +27,3 @@ output "external_secrets_irsa_role_arn" {
   description = "IAM Role ARN for External Secrets Operator IRSA"
   value       = module.secrets_iam.external_secrets_irsa_role_arn
 }
-
-output "holmes_mcp_role_arn" {
-  description = "IAM Role ARN for Holmes AWS MCP server IRSA"
-  value       = module.secrets_iam.holmes_mcp_role_arn
-}

@@ -20,7 +20,6 @@ rds_skip_final_snapshot = false
 
 enable_serverless_redis  = true
 enable_non_cluster_redis = false
-enable_holmes_mcp_iam    = true
 
 alert_email = "sean@currentai.org"
 smtp_host   = "email-smtp.eu-west-3.amazonaws.com"

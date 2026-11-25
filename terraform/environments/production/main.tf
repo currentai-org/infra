@@ -68,10 +68,8 @@ module "secrets_iam" {
   rds_master_password       = random_password.rds_master.result
   redis_endpoint            = module.redis.serverless_endpoint
   redis_port                = coalesce(module.redis.serverless_port, 6379)
-  enable_holmes_mcp_iam     = var.enable_holmes_mcp_iam
   agent_service_secret_name = "prd/agent-service"
   pangolin_secret_name      = "/prd/pangolin"
-  cluster_agent_secret_name = "prd/cluster-agent"
   infra_secret_name         = "prd/cai-infra"
 }
 

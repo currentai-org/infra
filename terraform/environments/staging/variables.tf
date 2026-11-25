@@ -88,11 +88,6 @@ variable "enable_non_cluster_redis" {
   description = "Enable non-cluster ElastiCache Redis replication group"
 }
 
-variable "enable_holmes_mcp_iam" {
-  type        = bool
-  description = "Enable IAM role for HolmesGPT AWS MCP server"
-}
-
 variable "alert_email" {
   type        = string
   description = "Alert email for Argo CD notifications"
