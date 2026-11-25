@@ -26,7 +26,7 @@ ingresses:
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
       alb.ingress.kubernetes.io/healthcheck-path: /healthz
     targetService:
-      name: agent-service-app
+      name: currentai-agent-service-app
       port: 80
 
   # --- Pangolin (CUR-1266 managed local-inference, charts/pangolin) -------------------------------
@@ -125,6 +125,7 @@ ingresses:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/healthcheck-path: /api/health
     targetService:
       name: grafana
       port: 80
@@ -138,6 +139,8 @@ ingresses:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.certificateArn }}"
+      alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
+      alb.ingress.kubernetes.io/success-codes: "200,401"
     targetService:
       name: prometheus-server
       port: 80
